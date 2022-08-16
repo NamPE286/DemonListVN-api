@@ -154,6 +154,7 @@ app.post('/admin/addLevel', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -165,6 +166,7 @@ app.post('/admin/addRecord', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -176,6 +178,7 @@ app.post('/admin/addPlayer', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -188,6 +191,7 @@ app.patch('/admin/editProfile', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -199,6 +203,7 @@ app.patch('/admin/editLevelInfo', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -210,6 +215,7 @@ app.patch('/admin/editRecordInfo', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -222,6 +228,7 @@ app.delete('/admin/deleteLevel', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -233,6 +240,7 @@ app.delete('/admin/deleteRecord', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
@@ -245,6 +253,7 @@ app.put('/admin/mergePlayer', async (req, res) => {
         res.status(401).send({
             'message': 'Token Invalid'
         })
+        return
     }
     res.status(200).send({
         'message': 'ok'
