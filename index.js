@@ -1,4 +1,5 @@
 const express = require('express')
+var cors = require('cors')
 const jwt_decode = require('jwt-decode')
 const app = express()
 require('dotenv').config()
@@ -18,6 +19,7 @@ async function isAdmin(token){
 }
 
 app.use(express.json())
+app.use(cors())
 
 app.get('/levels/:id', async (req, res) => {
     const { id } = req.params

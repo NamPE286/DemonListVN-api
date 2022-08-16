@@ -2,6 +2,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^1.35.6",
     "autocorrect": "^1.2.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "jwt-decode": "^3.1.2",
