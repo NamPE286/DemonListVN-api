@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-//require('dotenv').config()
+require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
@@ -17,7 +17,7 @@ app.get('/levels/:id', async (req, res) => {
         .select('*')
         .eq('id', id)
     if(data.length == 0){
-        res.status(410).send({
+        res.status(400).send({
             message: 'Level does not exists'
         })
         return
@@ -33,25 +33,18 @@ app.get('/levels/:id', async (req, res) => {
     res.status(200).send(d)
 })
 
-app.get('/levels/DL/page/:id', async (req, res) => {
-    const { id } = req.params
+app.get('/levels/:country/page/:id', async (req, res) => {
+    const { id, country } = req.params
     var { data, error } = await supabase
         .from('levels')
         .select('*')
-        .order('dlTop', { ascending: true })
+        .order(`${country}Top`, { ascending: true })
         .range((id - 1) * 200, id * 200 - 1)
-        .not("dlTop", 'is', null)
-    res.status(200).send(data)
-})
-
-app.get('/levels/FL/page/:id', async (req, res) => {
-    const { id } = req.params
-    var { data, error } = await supabase
-        .from('levels')
-        .select('*')
-        .order('flTop', { ascending: true })
-        .range((id - 1) * 200, id * 200 - 1)
-        .not("flTop", 'is', null)
+        .not(`${country}Top`, 'is', null)
+    if(error){
+        res.status(400).send(error)
+        return
+    }
     res.status(200).send(data)
 })
 
@@ -62,7 +55,7 @@ app.get('/players/:id', async (req, res) =>{
         .select('*')
         .eq('uid', id)
     if(!data){
-        res.status(410).send({
+        res.status(400).send({
             message: 'Player does not exists'
         })
         return
@@ -88,25 +81,18 @@ app.get('/players/:id/records/:order', async (req, res) => {
         .order(order, {ascending: false})
     res.status(200).send(data)
 })
-app.get('/players/DL/page/:id', async (req, res) => {
-    const { id } = req.params
+app.get('/players/:country/page/:id', async (req, res) => {
+    const { id, country } = req.params
     const { data, error } = await supabase
         .from('players')
-        .select('uid, name, avatar, email, totalFLpt, totalDLpt, flrank, dlrank country')
-        .order('dlrank', {ascending: true})
+        .select('*')
+        .order(`${country}rank`, {ascending: true})
         .range((id - 1) * 200, id * 200 - 1)
-        .not("dlrank", 'is', null)
-    res.status(200).send(data)
-})
-
-app.get('/players/FL/page/:id', async (req, res) => {
-    const { id } = req.params
-    const { data, error } = await supabase
-        .from('players')
-        .select('uid, name, avatar, email, totalFLpt, totalDLpt, flrank, dlrank country')
-        .order('flrank', {ascending: true})
-        .range((id - 1) * 200, id * 200 - 1)
-        .not("flrank", 'is', null)
+        .not(`${country}rank`, 'is', null)
+    if(error){
+        res.status(400).send(error)
+        return
+    }
     res.status(200).send(data)
 })
 

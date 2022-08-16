@@ -9,7 +9,7 @@ Southeast Asian's Demon List REST API
 |:---------------|:----------------------------------
 | `levelID`      | `number`
 | `userID`       | `uuid-v4`
-| `list`         | `FL` `DL` 
+| `list`         | `fl (VN only)` `dl (VN only)` `sea`
 | `orderBy`      | `timestamp` `dlPt` `flPt` `levelid`
 
 ## Get a level's info and records
