@@ -1,21 +1,28 @@
 const express = require('express')
 var cors = require('cors')
-const jwt_decode = require('jwt-decode')
+const jwt = require('jsonwebtoken')
 const app = express()
 require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
-async function isAdmin(token){
-    user = jwt_decode(token)
-    currentTime = new Date().getTime() / 1000
-    if(user.exp < currentTime) return false
-    var { data, error } = await supabase
-        .from('players')
-        .select('isAdmin')
-        .eq('uid', user.sub)
-        .single()
-    return data.isAdmin
+function isAdmin(token){
+    try{
+        jwt.verify(token, process.env.JWT_SECRET)
+        var userData;
+        async function getData(){
+            var { data, error } = await supabase
+                .from('players')
+                .select('isAdmin')
+                .eq('uid', user.sub)
+                .single()
+            userData = data
+        }
+        return userData
+    }
+    catch(err){
+        return false
+    }
 }
 
 app.use(express.json())
