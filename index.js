@@ -185,18 +185,6 @@ app.post('/admin/addPlayer', async (req, res) => {
     })
 })
 
-app.patch('/admin/editProfile', async (req, res) => {
-    const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
-    })
-})
 app.patch('/admin/editLevelInfo', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
