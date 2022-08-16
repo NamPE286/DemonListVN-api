@@ -93,7 +93,7 @@ Southeast Asian's Demon List REST API
       }
     ]
 
-## Get a player records
+## Get a player's records
 ### Request
   `GET /players/[userID]/records/[orderBy]
 
@@ -117,7 +117,7 @@ Southeast Asian's Demon List REST API
       ...
     ]
    
-## Get a player submissions
+## Get a player's submissions
 ### Request
   `GET /players/[userID]/submissions`
  
