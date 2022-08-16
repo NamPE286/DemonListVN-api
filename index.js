@@ -70,7 +70,7 @@ app.get('/players/:id', async (req, res) =>{
     res.status(200).send(data)
 })
 
-app.get('/players/:id/submission', async (req, res) => {
+app.get('/players/:id/submissions', async (req, res) => {
     const { id } = req.params
     var { data, error } = await supabase
         .from('submissions')
