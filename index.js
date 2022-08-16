@@ -92,7 +92,7 @@ app.get('/players/DL/page/:id', async (req, res) => {
     const { id } = req.params
     const { data, error } = await supabase
         .from('players')
-        .select('uid, name, avatar, email, totalFLpt, totalDLpt, flrank, dlrank')
+        .select('uid, name, avatar, email, totalFLpt, totalDLpt, flrank, dlrank country')
         .order('dlrank', {ascending: true})
         .range((id - 1) * 200, id * 200 - 1)
         .not("dlrank", 'is', null)
@@ -103,7 +103,7 @@ app.get('/players/FL/page/:id', async (req, res) => {
     const { id } = req.params
     const { data, error } = await supabase
         .from('players')
-        .select('uid, name, avatar, email, totalFLpt, totalDLpt, flrank, dlrank')
+        .select('uid, name, avatar, email, totalFLpt, totalDLpt, flrank, dlrank country')
         .order('flrank', {ascending: true})
         .range((id - 1) * 200, id * 200 - 1)
         .not("flrank", 'is', null)
