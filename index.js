@@ -1,8 +1,21 @@
 const express = require('express')
+const jwt_decode = require('jwt-decode')
 const app = express()
 require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
+
+async function isAdmin(token){
+    user = jwt_decode(token)
+    currentTime = new Date().getTime() / 1000
+    if(user.exp < currentTime) return false
+    var { data, error } = await supabase
+        .from('players')
+        .select('isAdmin')
+        .eq('uid', user.sub)
+        .single()
+    return data.isAdmin
+}
 
 app.use(express.json())
 
@@ -32,7 +45,6 @@ app.get('/levels/:id', async (req, res) => {
     d.records = data
     res.status(200).send(d)
 })
-
 app.get('/levels/:list/page/:id', async (req, res) => {
     const { id, list } = req.params
     var { data, error } = await supabase
@@ -47,7 +59,6 @@ app.get('/levels/:list/page/:id', async (req, res) => {
     }
     res.status(200).send(data)
 })
-
 app.get('/players/:id', async (req, res) =>{
     const { id } = req.params
     var { data, error } = await supabase
@@ -62,7 +73,6 @@ app.get('/players/:id', async (req, res) =>{
     }
     res.status(200).send(data)
 })
-
 app.get('/players/:id/submissions', async (req, res) => {
     const { id } = req.params
     var { data, error } = await supabase
@@ -95,7 +105,6 @@ app.get('/players/:list/page/:id', async (req, res) => {
     }
     res.status(200).send(data)
 })
-
 app.get('/search/:id', async (req, res) => {
     var { id } = req.params
     if (isNaN(id)) {
@@ -137,6 +146,109 @@ app.get('/search/:id', async (req, res) => {
             .eq('id', id)
         res.status(200).send(data)
     }
+})
+
+app.post('/admin/addLevel', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+app.post('/admin/addRecord', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+app.post('/admin/addPlayer', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+
+app.patch('/admin/editProfile', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+app.patch('/admin/editLevelInfo', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+app.patch('/admin/editRecordInfo', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+
+app.delete('/admin/deleteLevel', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+app.delete('/admin/deleteRecord', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+
+app.put('/admin/mergePlayer', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
 })
 
 app.listen(
