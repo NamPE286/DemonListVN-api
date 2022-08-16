@@ -67,6 +67,7 @@ app.get('/players/:id', async (req, res) =>{
         .from('players')
         .select('*')
         .eq('uid', id)
+        .single()
     if(!data){
         res.status(400).send({
             message: 'Player does not exists'
