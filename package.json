@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^1.35.6",
+    "autocorrect": "^1.2.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "typescript": "^4.7.4"
+  }
+}
