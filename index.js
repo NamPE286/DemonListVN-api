@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
-const PORT = 8080
-require('dotenv').config()
+//require('dotenv').config()
+const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
 app.use(express.json())

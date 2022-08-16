@@ -5,5 +5,27 @@
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "typescript": "^4.7.4"
-  }
+  },
+  "name": "demonlistseaapi",
+  "description": "Southeast Asian's Demon List REST API",
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": "16.x"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NamPE286/SEADemonList-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NamPE286/SEADemonList-api/issues"
+  },
+  "homepage": "https://github.com/NamPE286/SEADemonList-api#readme"
 }
