@@ -79,7 +79,15 @@ app.get('/players/:id/submissions', async (req, res) => {
         .order("id", {ascending: false})
     res.status(200).send(data)
 })
-
+app.get('/players/:id/records/:order', async (req, res) => {
+    const { id, order } = req.params
+    var { data, error } = await supabase
+        .from('records')
+        .select('*, levels(name)')
+        .eq('userid', id)
+        .order(order, {ascending: false})
+    res.status(200).send(data)
+})
 app.get('/players/DL/page/:id', async (req, res) => {
     const { id } = req.params
     const { data, error } = await supabase
