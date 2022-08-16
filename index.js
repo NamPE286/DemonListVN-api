@@ -33,14 +33,14 @@ app.get('/levels/:id', async (req, res) => {
     res.status(200).send(d)
 })
 
-app.get('/levels/:country/page/:id', async (req, res) => {
-    const { id, country } = req.params
+app.get('/levels/:list/page/:id', async (req, res) => {
+    const { id, list } = req.params
     var { data, error } = await supabase
         .from('levels')
         .select('*')
-        .order(`${country}Top`, { ascending: true })
+        .order(`${list}Top`, { ascending: true })
         .range((id - 1) * 200, id * 200 - 1)
-        .not(`${country}Top`, 'is', null)
+        .not(`${list}Top`, 'is', null)
     if(error){
         res.status(400).send(error)
         return
@@ -81,14 +81,14 @@ app.get('/players/:id/records/:order', async (req, res) => {
         .order(order, {ascending: false})
     res.status(200).send(data)
 })
-app.get('/players/:country/page/:id', async (req, res) => {
-    const { id, country } = req.params
+app.get('/players/:list/page/:id', async (req, res) => {
+    const { id, list } = req.params
     const { data, error } = await supabase
         .from('players')
         .select('*')
-        .order(`${country}rank`, {ascending: true})
+        .order(`${list}rank`, {ascending: true})
         .range((id - 1) * 200, id * 200 - 1)
-        .not(`${country}rank`, 'is', null)
+        .not(`${list}rank`, 'is', null)
     if(error){
         res.status(400).send(error)
         return
