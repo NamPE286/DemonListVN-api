@@ -72,6 +72,16 @@
       }
     }
 
+## Delete a level
+### Request
+  `PUT /level/[levelID]`
+
+### Header
+    {
+      "token": ""
+    }
+
+
 ## Get a list of levels in a list
 ### Request
   `GET /levels/[list]/page/[pageNumber]`
