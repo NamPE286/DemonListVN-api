@@ -159,7 +159,7 @@ app.delete('/level/:id', async (req, res) => {
     var { data, error } = await supabase
         .from('levels')
         .delete()
-        .match({id: level.id})
+        .match({id: id})
     if(error){
         res.status(500).send(error)
         return
