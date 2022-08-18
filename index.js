@@ -73,19 +73,35 @@ app.put('/level/:id', async (req, res) => {
 		minProgress: null,
 		flTop: null,
 		dlTop: null,
-		seaTop: null,
+		seaTop: null
 	}
+    try{
+        if(data.dlTop == null){}
+        else if(data.dlTop < data.prevdlTop) data.dlTop -= 0.5
+        else if(data.dlTop > data.prevdlTop) data.dlTop += 0.5
+    }
+    catch{
+        data.dlTop -= 0.5
+    }
+    try{
+        if(data.flTop == null){}
+        else if(data.flTop < data.prevflTop) data.flTop -= 0.5
+        else if(data.flTop > data.prevflTop) data.flTop += 0.5
+    }
+    catch{
+        data.flTop -= 0.5
+    }
+    try{
+        if(data.seaTop == null){}
+        else if(data.seaTop < data.prevseaTop) data.seaTop -= 0.5
+        else if(data.seaTop > data.prevseaTop) data.dlTop += 0.5
+    }
+    catch{
+        data.seaTop -= 0.5
+    }
     try{
         for(const i in data){
             if(i in level) {
-                if(i.includes('Top') && !i.includes('prev') && level[i] != null) {
-                    if('prev' + i in data){
-                        if(data['prev' + i] > data[i]){
-                            data[i] += 0.5
-                        }
-                        else data[i] -= 0.5
-                    }
-                }
                 level[i] = data[i]
             }
         }
@@ -94,6 +110,7 @@ app.put('/level/:id', async (req, res) => {
         res.status(400).send(err)
         return
     }
+    console.log(data)
     fetch(`https://gdbrowser.com/api/level/${id}`)
         .then((res) => res.json())
         .then(async (dat) => {
