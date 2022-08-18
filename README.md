@@ -9,7 +9,6 @@
 | `list`            | `fl (VN only)` `dl (VN only)` `sea`
 | `orderBy`         | `timestamp` `dlPt` `flPt` `levelid`
 | `pageNumber`      | `number`
-| `token`           | `string`
 
 ## Get a level's info and records
 ### Request
