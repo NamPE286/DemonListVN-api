@@ -67,7 +67,6 @@ app.put('/level/:id', async (req, res) => {
         return
     }
 	var level = {
-		id: null,
 		name: null,
 		creator: null,
 		videoID: null,
@@ -95,21 +94,7 @@ app.put('/level/:id', async (req, res) => {
         res.status(400).send(err)
         return
     }
-    if(level.id != null && parseInt(id) != level.id){
-        async function update(){
-            var { data, error } = await supabase
-                .from('records')
-                .update({levelid: level.id})
-                .match({levelid: id})
-            var { data, error } = await supabase
-                .from('submissions')
-                .update({levelid: level.id})
-                .match({levelid: id})
-        }
-        update()
-    }
-    else level.id = parseInt(id)
-    fetch(`https://gdbrowser.com/api/level/${level.id}`)
+    fetch(`https://gdbrowser.com/api/level/${id}`)
         .then((res) => res.json())
         .then(async (dat) => {
             if(dat == -1){
