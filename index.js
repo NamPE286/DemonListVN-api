@@ -56,6 +56,104 @@ app.get('/level/:id', async (req, res) => {
     d.records = data
     res.status(200).send(d)
 })
+app.put('/level/:id', async (req, res) => {
+    const { id } = req.params
+    const { token, data } = req.body
+    delete data.id
+    data.id = parseInt(id)
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+        return
+    }
+	var level = {
+		id: null,
+		name: null,
+		creator: null,
+		videoID: null,
+		minProgress: null,
+		flTop: null,
+		dlTop: null,
+		seaTop: null,
+	}
+    try{
+        for(const i in data){
+            if(i in level) {
+                if(i.includes('Top') && !i.includes('prev') && level[i] != null) {
+                    if('prev' + i in data){
+                        if(data['prev' + i] > data[i]){
+                            data[i] += 0.5
+                        }
+                        else data[i] -= 0.5
+                    }
+                }
+                level[i] = data[i]
+            }
+        }
+    }
+    catch(err){
+        res.status(400).send(err)
+        return
+    }
+    fetch(`https://gdbrowser.com/api/level/${level.id}`)
+        .then((res) => res.json())
+        .then(async (dat) => {
+            if(dat == -1){
+                res.status(400).send({
+                    'message': 'Level does not exist.'
+                })
+                return
+            }
+            level.name = dat.name
+            level.creator = dat.author
+            var { data, error } = await supabase
+                .from('levels')
+                .upsert(level)
+            if(error){
+                res.status(500).send(error)
+                return
+            }
+            var { data, error } = await supabase
+                .rpc('updateRank')
+            if(error){
+                res.status(500).send(error)
+                return
+            }
+            res.status(200).send(level)
+        })
+})
+app.delete('/level/:id', async (req, res) => {
+    const { id } = req.params
+    const { token } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+        return
+    }
+    var { data, error } = await supabase
+        .from('submissions')
+        .delete()
+        .match({ levelid: id })
+    var { data, error } = await supabase
+        .from('records')
+        .delete()
+        .match({ levelid: id })
+    var { data, error } = await supabase
+        .from('levels')
+        .delete()
+        .match({id: level.id})
+    if(error){
+        res.status(500).send(error)
+        return
+    }
+    var { data, error } = await supabase
+        .rpc('updateRank')
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
 app.get('/levels/:list/page/:id', async (req, res) => {
     const { id, list } = req.params
     var { data, error } = await supabase
@@ -159,103 +257,7 @@ app.get('/search/:id', async (req, res) => {
         res.status(200).send(data)
     }
 })
-
-app.put('/level/:id', async (req, res) => {
-    const { id } = req.params
-    const { token, data } = req.body
-    delete data.id
-    data.id = parseInt(id)
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-	var level = {
-		id: null,
-		name: null,
-		creator: null,
-		videoID: null,
-		minProgress: null,
-		flTop: null,
-		dlTop: null,
-		seaTop: null,
-	}
-    try{
-        for(const i in data){
-            if(i in level) {
-                if(i.includes('Top') && !i.includes('prev') && level[i] != null) {
-                    if('prev' + i in data){
-                        if(data['prev' + i] > data[i]){
-                            data[i] += 0.5
-                        }
-                        else data[i] -= 0.5
-                    }
-                }
-                level[i] = data[i]
-            }
-        }
-    }
-    catch(err){
-        res.status(400).send(err)
-        return
-    }
-    fetch(`https://gdbrowser.com/api/level/${level.id}`)
-        .then((res) => res.json())
-        .then(async (dat) => {
-            if(dat == -1){
-                res.status(400).send({
-                    'message': 'Level does not exist.'
-                })
-                return
-            }
-            level.name = dat.name
-            level.creator = dat.author
-            var { data, error } = await supabase
-                .from('levels')
-                .upsert(level)
-            if(error){
-                res.status(500).send(error)
-                return
-            }
-            var { data, error } = await supabase
-                .rpc('updateRank')
-            if(error){
-                res.status(500).send(error)
-                return
-            }
-            res.status(200).send(level)
-        })
-})
-app.delete('/level/:id', async (req, res) => {
-    const { id } = req.params
-    const { token } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    var { data, error } = await supabase
-        .from('submissions')
-        .delete()
-        .match({ levelid: id })
-    var { data, error } = await supabase
-        .from('records')
-        .delete()
-        .match({ levelid: id })
-    var { data, error } = await supabase
-        .from('levels')
-        .delete()
-        .match({id: level.id})
-    if(error){
-        res.status(500).send(error)
-    }
-    res.status(200).send({
-        'message': 'ok'
-    })
-})
-app.post('/record/:id', async (req, res) => {
+app.put('/record/:id', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
         res.status(401).send({
@@ -267,45 +269,19 @@ app.post('/record/:id', async (req, res) => {
         'message': 'ok'
     })
 })
-app.post('/players/:id', async (req, res) => {
-    const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
-    })
-})
-
-app.patch('/levels/:id', async (req, res) => {
-    const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
-    })
-})
-app.patch('/records/:id', async (req, res) => {
-    const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
-    })
-})
-
 app.delete('/records/:id', async (req, res) => {
+    const { token, data } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+        return
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+app.put('/player/:id', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
         res.status(401).send({
