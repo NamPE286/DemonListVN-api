@@ -105,6 +105,7 @@ app.put('/level/:id', async (req, res) => {
             }
             level.name = dat.name
             level.creator = dat.author
+            level.id = parseInt(id)
             var { data, error } = await supabase
                 .from('levels')
                 .upsert(level)
