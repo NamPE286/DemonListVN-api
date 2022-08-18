@@ -180,18 +180,17 @@ app.put('/level/:id', async (req, res) => {
 		flTop: null,
 		dlTop: null,
 		seaTop: null,
-        prevflTop: null,
-		prevdlTop: null,
-		prevseaTop: null
 	}
     try{
         for(const i in data){
             if(i in level) {
                 if(i.includes('Top') && !i.includes('prev') && level[i] != null) {
-                    if(level['prev' + i] > level[i]){
-                        data[i] += 0.5
+                    if('prev' + i in data){
+                        if(data['prev' + i] > data[i]){
+                            data[i] += 0.5
+                        }
+                        else data[i] -= 0.5
                     }
-                    else data[i] -= 0.5
                 }
                 level[i] = data[i]
             }
