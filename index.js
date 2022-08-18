@@ -60,8 +60,6 @@ app.get('/level/:id', async (req, res) => {
 app.put('/level/:id', async (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
-    delete data.id
-    data.id = parseInt(id)
     if(!isAdmin(token)) {
         res.status(401).send({
             'message': 'Token Invalid'
@@ -97,6 +95,20 @@ app.put('/level/:id', async (req, res) => {
         res.status(400).send(err)
         return
     }
+    if(level.id != null && parseInt(id) != level.id){
+        async function update(){
+            var { data, error } = await supabase
+                .from('records')
+                .update({levelid: level.id})
+                .match({levelid: id})
+            var { data, error } = await supabase
+                .from('submissions')
+                .update({levelid: level.id})
+                .match({levelid: id})
+        }
+        update()
+    }
+    else level.id = parseInt(id)
     fetch(`https://gdbrowser.com/api/level/${level.id}`)
         .then((res) => res.json())
         .then(async (dat) => {
