@@ -115,7 +115,7 @@
 
 ## Get a player's records
 ### Request
-  `GET /player/[userID]/records/[orderBy]
+  `GET /player/[userID]/records/[orderBy]`
 
 ### Response
     [
