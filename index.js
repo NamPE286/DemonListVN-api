@@ -24,7 +24,8 @@ function isAdmin(token){
         return true
     }
     catch(err){
-        return false
+        console.log(err.message)
+        return err
     }
 }
 
@@ -62,10 +63,11 @@ app.put('/level/:id', async (req, res) => {
     const { token, data } = req.body
     delete data.id
     data.id = parseInt(id)
-    if(!isAdmin(token)) {
+    if(isAdmin(token) != true) {
         res.status(401).send({
             'message': 'Token Invalid',
-            'token': token
+            'token': token,
+            'error':isAdmin(token).message
         })
         return
     }
