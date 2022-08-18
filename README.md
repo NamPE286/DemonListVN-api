@@ -1,6 +1,3 @@
-# SEADemonList-api
-Southeast Asian's Demon List REST API
-
 # REST API
 
 ## Parameter
@@ -12,10 +9,11 @@ Southeast Asian's Demon List REST API
 | `list`            | `fl (VN only)` `dl (VN only)` `sea`
 | `orderBy`         | `timestamp` `dlPt` `flPt` `levelid`
 | `pageNumber`      | `number`
+| `token`           | `string`
 
 ## Get a level's info and records
 ### Request
-  `GET /levels/[levelID]`
+  `GET /level/[levelID]`
 
 ### Response
 
@@ -51,6 +49,27 @@ Southeast Asian's Demon List REST API
       ]
     }
 
+## Add/Edit a level's info
+### Request
+  `PUT /level/[levelID]`
+
+### Header
+    {
+      "token": "",
+      "data": {
+        "name": "The Moon Below",
+        "creator": "Onvil",
+        "videoID": "Gs5mRmoLh7g",
+        "minProgress": 100,
+        "flTop": 2,
+        "dlTop": null,
+        "flPt": 138.75,
+        "dlPt": null,
+        "seaTop": null,
+        "seaPt": null
+      }
+    }
+
 ## Get a list of levels in a list
 ### Request
   `GET /levels/[list]/page/[pageNumber]`
@@ -73,7 +92,7 @@ Southeast Asian's Demon List REST API
     
 ## Get a player's info
 ### Request
-  `GET /players/[userID]`
+  `GET /player/[userID]`
 
 ### Response
     [
@@ -96,7 +115,7 @@ Southeast Asian's Demon List REST API
 
 ## Get a player's records
 ### Request
-  `GET /players/[userID]/records/[orderBy]
+  `GET /player/[userID]/records/[orderBy]
 
 ### Response
     [
@@ -120,7 +139,7 @@ Southeast Asian's Demon List REST API
    
 ## Get a player's submissions
 ### Request
-  `GET /players/[userID]/submissions`
+  `GET /player/[userID]/submissions`
  
 ### Response
     [

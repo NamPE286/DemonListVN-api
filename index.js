@@ -2,14 +2,16 @@ const express = require('express')
 var cors = require('cors')
 const jwt = require('jsonwebtoken')
 const app = express()
+const fetch = require('cross-fetch')
 require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
+var userData;
+
 function isAdmin(token){
     try{
         jwt.verify(token, process.env.JWT_SECRET)
-        var userData;
         async function getData(){
             var { data, error } = await supabase
                 .from('players')
@@ -18,7 +20,7 @@ function isAdmin(token){
                 .single()
             userData = data
         }
-        return userData
+        return true
     }
     catch(err){
         return false
@@ -28,7 +30,7 @@ function isAdmin(token){
 app.use(express.json())
 app.use(cors())
 
-app.get('/levels/:id', async (req, res) => {
+app.get('/level/:id', async (req, res) => {
     const { id } = req.params
     const d = {
         data:{},
@@ -68,7 +70,7 @@ app.get('/levels/:list/page/:id', async (req, res) => {
     }
     res.status(200).send(data)
 })
-app.get('/players/:id', async (req, res) =>{
+app.get('/player/:id', async (req, res) =>{
     const { id } = req.params
     var { data, error } = await supabase
         .from('players')
@@ -83,7 +85,7 @@ app.get('/players/:id', async (req, res) =>{
     }
     res.status(200).send(data)
 })
-app.get('/players/:id/submissions', async (req, res) => {
+app.get('/player/:id/submissions', async (req, res) => {
     const { id } = req.params
     var { data, error } = await supabase
         .from('submissions')
@@ -92,7 +94,7 @@ app.get('/players/:id/submissions', async (req, res) => {
         .order("id", {ascending: false})
     res.status(200).send(data)
 })
-app.get('/players/:id/records/:order', async (req, res) => {
+app.get('/player/:id/records/:order', async (req, res) => {
     const { id, order } = req.params
     var { data, error } = await supabase
         .from('records')
@@ -158,7 +160,89 @@ app.get('/search/:id', async (req, res) => {
     }
 })
 
-app.post('/admin/addLevel', async (req, res) => {
+app.put('/level/:id', async (req, res) => {
+    const { id } = req.params
+    const { token, data } = req.body
+    delete data.id
+    data.id = parseInt(id)
+    if(isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+        return
+    }
+	var level = {
+		id: null,
+		name: null,
+		creator: null,
+		videoID: null,
+		minProgress: null,
+		flTop: null,
+		dlTop: null,
+		seaTop: null
+	}
+    for(const i in data){
+        if(i in level) {
+            if(i.includes('Top') && level[i] != null) data[i] -= 0.5
+            level[i] = data[i]
+        }
+    }
+    fetch(`https://gdbrowser.com/api/level/${level.id}`)
+        .then((res) => res.json())
+        .then(async (dat) => {
+            if(dat == -1){
+                res.status(400).send({
+                    'message': 'Level does not exist.'
+                })
+                return
+            }
+            level.name = dat.name
+            level.creator = dat.author
+            var { data, error } = await supabase
+                .from('levels')
+                .upsert(level)
+            if(error){
+                res.status(500).send(error)
+                return
+            }
+            var { data, error } = await supabase
+                .rpc('updateRank')
+            if(error){
+                res.status(500).send(error)
+                return
+            }
+            res.status(200).send(level)
+        })
+})
+app.delete('/level/:id', async (req, res) => {
+    const { id } = req.params
+    const { token } = req.body
+    if(!isAdmin(token)) {
+        res.status(401).send({
+            'message': 'Token Invalid'
+        })
+        return
+    }
+    var { data, error } = await supabase
+        .from('submissions')
+        .delete()
+        .match({ levelid: id })
+    var { data, error } = await supabase
+        .from('records')
+        .delete()
+        .match({ levelid: id })
+    var { data, error } = await supabase
+        .from('levels')
+        .delete()
+        .match({id: level.id})
+    if(error){
+        res.status(500).send(error)
+    }
+    res.status(200).send({
+        'message': 'ok'
+    })
+})
+app.post('/record/:id', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
         res.status(401).send({
@@ -170,19 +254,7 @@ app.post('/admin/addLevel', async (req, res) => {
         'message': 'ok'
     })
 })
-app.post('/admin/addRecord', async (req, res) => {
-    const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
-    })
-})
-app.post('/admin/addPlayer', async (req, res) => {
+app.post('/players/:id', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
         res.status(401).send({
@@ -195,7 +267,7 @@ app.post('/admin/addPlayer', async (req, res) => {
     })
 })
 
-app.patch('/admin/editLevelInfo', async (req, res) => {
+app.patch('/levels/:id', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
         res.status(401).send({
@@ -207,7 +279,7 @@ app.patch('/admin/editLevelInfo', async (req, res) => {
         'message': 'ok'
     })
 })
-app.patch('/admin/editRecordInfo', async (req, res) => {
+app.patch('/records/:id', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
         res.status(401).send({
@@ -220,19 +292,7 @@ app.patch('/admin/editRecordInfo', async (req, res) => {
     })
 })
 
-app.delete('/admin/deleteLevel', async (req, res) => {
-    const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
-    })
-})
-app.delete('/admin/deleteRecord', async (req, res) => {
+app.delete('/records/:id', async (req, res) => {
     const { token, data } = req.body
     if(!isAdmin(token)) {
         res.status(401).send({
