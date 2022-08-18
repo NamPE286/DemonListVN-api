@@ -64,7 +64,8 @@ app.put('/level/:id', async (req, res) => {
     data.id = parseInt(id)
     if(!isAdmin(token)) {
         res.status(401).send({
-            'message': 'Token Invalid'
+            'message': 'Token Invalid',
+            'token': token
         })
         return
     }
