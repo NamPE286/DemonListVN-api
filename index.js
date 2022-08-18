@@ -165,7 +165,7 @@ app.put('/level/:id', async (req, res) => {
     const { token, data } = req.body
     delete data.id
     data.id = parseInt(id)
-    if(isAdmin(token)) {
+    if(!isAdmin(token)) {
         res.status(401).send({
             'message': 'Token Invalid'
         })
