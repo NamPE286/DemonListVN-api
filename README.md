@@ -57,8 +57,6 @@
     {
       "token": "",
       "data": {
-        "name": "The Moon Below",
-        "creator": "Onvil",
         "videoID": "Gs5mRmoLh7g",
         "minProgress": 100,
         //Add the following lines if you want to edit level's placement or add new level

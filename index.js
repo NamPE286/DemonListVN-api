@@ -10,6 +10,8 @@ const supabase = require('@supabase/supabase-js').createClient(process.env.API_U
 var userData;
 
 function isAdmin(token){
+    console.log(process.env.DEVELOPMENT_SERVER)
+    if(process.env.DEVELOPMENT_SERVER) return true
     try{
         jwt.verify(token, process.env.JWT_SECRET)
         async function getData(){
