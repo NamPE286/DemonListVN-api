@@ -179,13 +179,27 @@ app.put('/level/:id', async (req, res) => {
 		minProgress: null,
 		flTop: null,
 		dlTop: null,
-		seaTop: null
+		seaTop: null,
+        prevflTop: null,
+		prevdlTop: null,
+		prevseaTop: null
 	}
-    for(const i in data){
-        if(i in level) {
-            if(i.includes('Top') && level[i] != null) data[i] -= 0.5
-            level[i] = data[i]
+    try{
+        for(const i in data){
+            if(i in level) {
+                if(i.includes('Top') && !i.includes('prev') && level[i] != null) {
+                    if(level['prev' + i] > level[i]){
+                        data[i] += 0.5
+                    }
+                    else data[i] -= 0.5
+                }
+                level[i] = data[i]
+            }
         }
+    }
+    catch(err){
+        res.status(400).send(err)
+        return
     }
     fetch(`https://gdbrowser.com/api/level/${level.id}`)
         .then((res) => res.json())

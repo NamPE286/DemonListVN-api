@@ -63,10 +63,15 @@
         "minProgress": 100,
         "flTop": 2,
         "dlTop": null,
+        //Add the following line if you want to edit level's placement or add new level
         "flPt": 138.75,
         "dlPt": null,
         "seaTop": null,
-        "seaPt": null
+        "seaPt": null,
+        //Add the following line if you want to edit level's placement, don't add them if you want to add a new level
+        "prevflTop": null,
+        "prevdlTop": null,
+        "prevseaTop": null
       }
     }
 
