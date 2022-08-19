@@ -5,6 +5,7 @@
 | Parameter      | Value                       
 |:---------------|:----------------------------------
 | `levelID`         | `number`
+| `recordID`        | `number`
 | `userID`          | `uuid-v4`
 | `list`            | `fl (VN only)` `dl (VN only)` `sea`
 | `orderBy`         | `timestamp` `dlPt` `flPt` `levelid`
@@ -199,4 +200,31 @@
         "flrank": null,
         "dlrank": 1
       },
+      ...
     ]
+
+## Add/Edit a record
+### Request
+  `PUT /record`
+### Header
+    {
+      "token": "",
+      "data":{
+        "id": null, //Add this to perform edit operation
+        "levelid": null,
+        "userid": null,
+        "videoLink": '',
+        "refreshRate": null,
+        "mobile": false,
+        "progress": null,
+        "timestamp": null
+      }
+    }
+
+## Delete a record
+### Request
+  `PATCH /record/[recordID]`
+### Header
+    {
+      "token": ""
+    }

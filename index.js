@@ -320,8 +320,8 @@ app.get('/search/:id', async (req, res) => {
         res.status(200).send(data)
     }
 })
-app.put('/record/:id', async (req, res) => {
-    const { token, data } = req.body
+app.put('/record', async (req, res) => {
+    const { token, record } = req.body
     checkAdmin(token).then((isAdmin) => {
         if(!isAdmin) {
             res.status(401).send({
@@ -329,10 +329,20 @@ app.put('/record/:id', async (req, res) => {
             })
             return
         }
+        record.timestmap = Date.now()
+		var { data, error } = await supabase
+			.from('records')
+			.upsert(record)
+		if(error){
+			res.status(500).send(error)
+			return
+		}
+		var { data, error} = await supabase.rpc('updateRank')
     })
 })
-app.delete('/records/:id', async (req, res) => {
-    const { token, data } = req.body
+app.delete('/record/:id', async (req, res) => {
+    const { id } = req.params
+    const { token } = req.body
     checkAdmin(token).then((isAdmin) => {
         if(!isAdmin) {
             res.status(401).send({
@@ -340,17 +350,15 @@ app.delete('/records/:id', async (req, res) => {
             })
             return
         }
-    })
-})
-app.put('/player/:id', async (req, res) => {
-    const { token, data } = req.body
-    checkAdmin(token).then((isAdmin) => {
-        if(!isAdmin) {
-            res.status(401).send({
-                'message': 'Token Invalid'
-            })
-            return
-        }
+		var { data, error } = await supabase
+			.from('records')
+			.delete()
+            .match({id : id})
+		if(error){
+			res.status(500).send(error)
+			return
+		}
+		var { data, error} = await supabase.rpc('updateRank')
     })
 })
 
