@@ -212,9 +212,7 @@ app.delete('/level/:id', (req, res) => {
         }
         var { data, error } = await supabase
             .rpc('updateRank')
-        res.status(200).send({
-            'message': 'ok'
-        })
+        res.status(200).send({})
     })
 })
 app.get('/levels/:list/page/:id', async (req, res) => {
@@ -339,7 +337,7 @@ app.put('/record', async (req, res) => {
 			return
 		}
 		var { data, error} = await supabase.rpc('updateRank')
-        res.status(200).send(record)
+        
     })
 })
 app.delete('/record/:id', async (req, res) => {
@@ -362,6 +360,7 @@ app.delete('/record/:id', async (req, res) => {
 		}
 		var { data, error} = await supabase.rpc('updateRank')
     })
+    res.status(200).send({})
 })
 
 app.put('/admin/mergePlayer', async (req, res) => {
