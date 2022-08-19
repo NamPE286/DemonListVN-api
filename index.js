@@ -319,7 +319,7 @@ app.put('/record', async (req, res) => {
     var { token, data } = req.body
     record = data
     checkAdmin(token).then( async (user) => {
-        if(!data) {
+        if(!user.isAdmin) {
             console.log(1)
             res.status(401).send({
                 'message': 'Token Invalid'
@@ -366,7 +366,7 @@ app.delete('/record/:id', async (req, res) => {
 
 app.put('/admin/mergePlayer', async (req, res) => {
     const { token, data } = req.body
-    checkAdmin(token).then((data) => {
+    checkAdmin(token).then((user) => {
         if(!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
