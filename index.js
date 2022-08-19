@@ -319,21 +319,25 @@ app.get('/search/:id', async (req, res) => {
     }
 })
 app.put('/record', async (req, res) => {
-    var { token, record } = req.body
+    var { token, data } = req.body
+    record = data
     checkAdmin(token).then( async (isAdmin) => {
         if(!isAdmin) {
+            console.log(1)
             res.status(401).send({
                 'message': 'Token Invalid'
             })
             return
         }
-        record.timestmap = Date.now()
+        console.log(2)
+        console.log(record)
 		var { data, error } = await supabase
 			.from('records')
 			.upsert(record)
         record = data
 		if(error){
 			res.status(500).send(error)
+            console.log(error)
 			return
 		}
 		var { data, error} = await supabase.rpc('updateRank')
