@@ -86,7 +86,7 @@
 
 ## Delete a level
 ### Request
-  `PUT /level/[levelID]`
+  `DELETE /level/[levelID]`
 
 ### Header
     {
@@ -223,7 +223,7 @@
 
 ## Delete a record
 ### Request
-  `PATCH /record/[recordID]`
+  `DELETE /record/[recordID]`
 ### Header
     {
       "token": ""
