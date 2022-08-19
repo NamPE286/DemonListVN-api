@@ -321,7 +321,7 @@ app.get('/search/:id', async (req, res) => {
     }
 })
 app.put('/record', async (req, res) => {
-    const { token, record } = req.body
+    var { token, record } = req.body
     checkAdmin(token).then((isAdmin) => {
         if(!isAdmin) {
             res.status(401).send({
@@ -333,11 +333,13 @@ app.put('/record', async (req, res) => {
 		var { data, error } = await supabase
 			.from('records')
 			.upsert(record)
+        record = data
 		if(error){
 			res.status(500).send(error)
 			return
 		}
 		var { data, error} = await supabase.rpc('updateRank')
+        res.status(200).send(record)
     })
 })
 app.delete('/record/:id', async (req, res) => {
