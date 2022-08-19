@@ -7,8 +7,6 @@ require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
-var userData;
-
 async function checkAdmin(token){
     if(process.env.DEVELOPMENT_SERVER) return true
     try{
@@ -19,8 +17,7 @@ async function checkAdmin(token){
             .select('*')
             .eq('uid', user.sub)
             .single()
-        userData = data
-        return data.isAdmin
+        return data
     }
     catch(err){
         return false
@@ -59,8 +56,8 @@ app.get('/level/:id', async (req, res) => {
 app.post('/level/:id', (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
-    checkAdmin(token).then((isAdmin) => {
-        if(!isAdmin) {
+    checkAdmin(token).then((data) => {
+        if(!data.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -116,8 +113,8 @@ app.post('/level/:id', (req, res) => {
 app.patch('/level/:id', (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
-    checkAdmin(token).then((isAdmin) => {
-        if(!isAdmin) {
+    checkAdmin(token).then((data) => {
+        if(!data.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -187,8 +184,8 @@ app.patch('/level/:id', (req, res) => {
 app.delete('/level/:id', (req, res) => {
     const { id } = req.params
     const { token } = req.body
-    checkAdmin().then(async (isAdmin) => {
-        if(!isAdmin) {
+    checkAdmin().then(async (data) => {
+        if(!data.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -321,8 +318,8 @@ app.get('/search/:id', async (req, res) => {
 app.put('/record', async (req, res) => {
     var { token, data } = req.body
     record = data
-    checkAdmin(token).then( async (isAdmin) => {
-        if(!isAdmin) {
+    checkAdmin(token).then( async (data) => {
+        if(!data) {
             console.log(1)
             res.status(401).send({
                 'message': 'Token Invalid'
@@ -347,8 +344,8 @@ app.put('/record', async (req, res) => {
 app.delete('/record/:id', async (req, res) => {
     const { id } = req.params
     const { token } = req.body
-    checkAdmin(token).then( async (isAdmin) => {
-        if(!isAdmin) {
+    checkAdmin(token).then( async (data) => {
+        if(!data.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -369,8 +366,8 @@ app.delete('/record/:id', async (req, res) => {
 
 app.put('/admin/mergePlayer', async (req, res) => {
     const { token, data } = req.body
-    checkAdmin(token).then((isAdmin) => {
-        if(!isAdmin) {
+    checkAdmin(token).then((data) => {
+        if(!data.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
