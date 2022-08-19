@@ -93,7 +93,7 @@ app.post('/level/:id', (req, res) => {
                     return
                 }
                 level.name = dat.name
-                level.creator = dat.author
+                if(!level.creator) level.creator = dat.author
                 level.id = parseInt(id)
                 var { data, error } = await supabase
                     .from('levels')
@@ -159,7 +159,7 @@ app.patch('/level/:id', (req, res) => {
                     return
                 }
                 level.name = dat.name
-                level.creator = dat.author
+                if(!level.creator) level.creator = dat.author
                 level.id = parseInt(id)
                 var { data, error } = await supabase
                     .from('levels')
