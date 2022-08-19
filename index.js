@@ -98,7 +98,7 @@ app.post('/level/:id', async (req, res) => {
             level.id = parseInt(id)
             var { data, error } = await supabase
                 .from('levels')
-                .upsert(level)
+                .insert(level)
             if(error){
                 res.status(500).send(error)
                 return
@@ -161,7 +161,7 @@ app.patch('/level/:id', async (req, res) => {
             level.id = parseInt(id)
             var { data, error } = await supabase
                 .from('levels')
-                .upsert(level)
+                .update(level)
             if(error){
                 res.status(500).send(error)
                 return
