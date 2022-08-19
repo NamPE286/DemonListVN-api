@@ -337,7 +337,7 @@ app.put('/record', async (req, res) => {
 			return
 		}
 		var { data, error} = await supabase.rpc('updateRank')
-        
+        res.status(200).send(record)
     })
 })
 app.delete('/record/:id', async (req, res) => {
