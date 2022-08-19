@@ -320,7 +320,7 @@ app.get('/search/:id', async (req, res) => {
 })
 app.put('/record', async (req, res) => {
     var { token, record } = req.body
-    checkAdmin(token).then((isAdmin) => {
+    checkAdmin(token).then( async (isAdmin) => {
         if(!isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
@@ -343,7 +343,7 @@ app.put('/record', async (req, res) => {
 app.delete('/record/:id', async (req, res) => {
     const { id } = req.params
     const { token } = req.body
-    checkAdmin(token).then((isAdmin) => {
+    checkAdmin(token).then( async (isAdmin) => {
         if(!isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
