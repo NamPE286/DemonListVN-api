@@ -48,7 +48,23 @@
       ]
     }
 
-## Add/Edit a level's info
+## Add a new level
+### Request
+  `POST /level/[levelID]`
+
+### Header
+    {
+      "token": "",
+      "data": {
+        "videoID": "Gs5mRmoLh7g",
+        "minProgress": 100,
+        "flTop": 2,
+        "dlTop": null,
+        "seaTop": null,
+      }
+    }
+
+## Edit a level's info
 ### Request
   `PUT /level/[levelID]`
 
@@ -58,11 +74,9 @@
       "data": {
         "videoID": "Gs5mRmoLh7g",
         "minProgress": 100,
-        //Add the following lines if you want to edit level's placement or add new level
         "flTop": 2,
         "dlTop": null,
         "seaTop": null,
-        //Don't add the following lines if you want to add a new level
         "prevflTop": null,
         "prevdlTop": null,
         "prevseaTop": null
