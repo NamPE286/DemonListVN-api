@@ -359,8 +359,8 @@ app.delete('/record/:id', async (req, res) => {
 			return
 		}
 		var { data, error} = await supabase.rpc('updateRank')
+        res.status(200).send({})
     })
-    res.status(200).send({})
 })
 
 app.put('/admin/mergePlayer', async (req, res) => {
