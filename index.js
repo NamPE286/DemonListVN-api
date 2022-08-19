@@ -134,14 +134,17 @@ app.patch('/level/:id', (req, res) => {
         }
 
         if(data.dlTop == null){}
+        else if(data.prevdlTop == null) data.seaTop -= 0.5
         else if(data.dlTop < data.prevdlTop) data.dlTop -= 0.5
         else if(data.dlTop > data.prevdlTop) data.dlTop += 0.5
 
         if(data.flTop == null){}
+        else if(data.prevflTop == null) data.seaTop -= 0.5
         else if(data.flTop < data.prevflTop) data.flTop -= 0.5
         else if(data.flTop > data.prevflTop) data.flTop += 0.5
 
         if(data.seaTop == null){}
+        else if(data.prevseaTop == null) data.seaTop -= 0.5
         else if(data.seaTop < data.prevseaTop) data.seaTop -= 0.5
         else if(data.seaTop > data.prevseaTop) data.dlTop += 0.5
         
