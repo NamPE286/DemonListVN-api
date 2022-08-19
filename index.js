@@ -56,8 +56,8 @@ app.get('/level/:id', async (req, res) => {
 app.post('/level/:id', (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
-    checkAdmin(token).then((data) => {
-        if(!data.isAdmin) {
+    checkAdmin(token).then(async (user) => {
+        if(!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -113,8 +113,8 @@ app.post('/level/:id', (req, res) => {
 app.patch('/level/:id', (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
-    checkAdmin(token).then((data) => {
-        if(!data.isAdmin) {
+    checkAdmin(token).then(async (user) => {
+        if(!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -184,8 +184,8 @@ app.patch('/level/:id', (req, res) => {
 app.delete('/level/:id', (req, res) => {
     const { id } = req.params
     const { token } = req.body
-    checkAdmin().then(async (data) => {
-        if(!data.isAdmin) {
+    checkAdmin(token).then( async (user) => {
+        if(!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -318,7 +318,7 @@ app.get('/search/:id', async (req, res) => {
 app.put('/record', async (req, res) => {
     var { token, data } = req.body
     record = data
-    checkAdmin(token).then( async (data) => {
+    checkAdmin(token).then( async (user) => {
         if(!data) {
             console.log(1)
             res.status(401).send({
@@ -344,8 +344,8 @@ app.put('/record', async (req, res) => {
 app.delete('/record/:id', async (req, res) => {
     const { id } = req.params
     const { token } = req.body
-    checkAdmin(token).then( async (data) => {
-        if(!data.isAdmin) {
+    checkAdmin(token).then( async (user) => {
+        if(!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -367,7 +367,7 @@ app.delete('/record/:id', async (req, res) => {
 app.put('/admin/mergePlayer', async (req, res) => {
     const { token, data } = req.body
     checkAdmin(token).then((data) => {
-        if(!data.isAdmin) {
+        if(!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
