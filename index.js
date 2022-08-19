@@ -31,8 +31,7 @@ function isAdmin(token){
 app.use(express.json())
 app.use(cors())
 
-app.get(
-    '/level/:id', async (req, res) => {
+app.get('/level/:id', async (req, res) => {
     const { id } = req.params
     const d = {
         data:{},
@@ -130,6 +129,7 @@ app.patch('/level/:id', async (req, res) => {
 		dlTop: null,
 		seaTop: null
 	}
+
     if(data.dlTop == null){}
     else if(data.dlTop < data.prevdlTop) data.dlTop -= 0.5
     else if(data.dlTop > data.prevdlTop) data.dlTop += 0.5
@@ -162,6 +162,7 @@ app.patch('/level/:id', async (req, res) => {
             var { data, error } = await supabase
                 .from('levels')
                 .update(level)
+                .match({id:level.id})
             if(error){
                 res.status(500).send(error)
                 return
