@@ -10,9 +10,9 @@ const supabase = require('@supabase/supabase-js').createClient(process.env.API_U
 var userData;
 
 async function checkAdmin(token){
-    //if(process.env.DEVELOPMENT_SERVER) return true
+    if(process.env.DEVELOPMENT_SERVER) return true
     try{
-        //jwt.verify(token, process.env.JWT_SECRET)
+        jwt.verify(token, process.env.JWT_SECRET)
         user = jwt.decode(token)
         var { data, error } = await supabase
             .from('players')
