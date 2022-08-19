@@ -76,14 +76,14 @@ app.post('/level/:id', async (req, res) => {
 		dlTop: null,
 		seaTop: null
 	}
-    data.flTop -= 0.5
-    data.dlTop -= 0.5
-    data.seaTop -= 0.5
     for(const i in data){
         if(i in level) {
             level[i] = data[i]
         }
     }
+    if(level.flTop != null) level.flTop -= 0.5
+    if(level.dlTop != null) level.dlTop -= 0.5
+    if(level.seaTop != null) level.seaTop -= 0.5
     fetch(`https://gdbrowser.com/api/level/${id}`)
         .then((res) => res.json())
         .then(async (dat) => {
