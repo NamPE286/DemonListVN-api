@@ -9,19 +9,18 @@ const supabase = require('@supabase/supabase-js').createClient(process.env.API_U
 
 var userData;
 
-function isAdmin(token){
+async function checkAdmin(token){
     //if(process.env.DEVELOPMENT_SERVER) return true
     try{
-        jwt.verify(token, process.env.JWT_SECRET)
-        async function getData(){
-            var { data, error } = await supabase
-                .from('players')
-                .select('isAdmin')
-                .eq('uid', user.sub)
-                .single()
-            userData = data
-        }
-        return true
+        //jwt.verify(token, process.env.JWT_SECRET)
+        user = jwt.decode(token)
+        var { data, error } = await supabase
+            .from('players')
+            .select('*')
+            .eq('uid', user.sub)
+            .single()
+        userData = data
+        return data.isAdmin
     }
     catch(err){
         return false
@@ -57,154 +56,160 @@ app.get('/level/:id', async (req, res) => {
     d.records = data
     res.status(200).send(d)
 })
-app.post('/level/:id', async (req, res) => {
+app.post('/level/:id', (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-	var level = {
-		name: null,
-		creator: null,
-		videoID: null,
-		minProgress: null,
-		flTop: null,
-		dlTop: null,
-		seaTop: null
-	}
-    for(const i in data){
-        if(i in level) {
-            level[i] = data[i]
+    checkAdmin(token).then((isAdmin) => {
+        if(!isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
         }
-    }
-    if(level.flTop != null) level.flTop -= 0.5
-    if(level.dlTop != null) level.dlTop -= 0.5
-    if(level.seaTop != null) level.seaTop -= 0.5
-    fetch(`https://gdbrowser.com/api/level/${id}`)
-        .then((res) => res.json())
-        .then(async (dat) => {
-            if(dat == -1){
-                res.status(400).send({
-                    'message': 'Level does not exist.'
-                })
-                return
+        var level = {
+            name: null,
+            creator: null,
+            videoID: null,
+            minProgress: null,
+            flTop: null,
+            dlTop: null,
+            seaTop: null
+        }
+        for(const i in data){
+            if(i in level) {
+                level[i] = data[i]
             }
-            level.name = dat.name
-            level.creator = dat.author
-            level.id = parseInt(id)
-            var { data, error } = await supabase
-                .from('levels')
-                .insert(level)
-            if(error){
-                res.status(500).send(error)
-                return
-            }
-            var { data, error } = await supabase
-                .rpc('updateRank')
-            if(error){
-                res.status(500).send(error)
-                return
-            }
-            res.status(200).send(level)
-        })
+        }
+        if(level.flTop != null) level.flTop -= 0.5
+        if(level.dlTop != null) level.dlTop -= 0.5
+        if(level.seaTop != null) level.seaTop -= 0.5
+        fetch(`https://gdbrowser.com/api/level/${id}`)
+            .then((res) => res.json())
+            .then(async (dat) => {
+                if(dat == -1){
+                    res.status(400).send({
+                        'message': 'Level does not exist.'
+                    })
+                    return
+                }
+                level.name = dat.name
+                level.creator = dat.author
+                level.id = parseInt(id)
+                var { data, error } = await supabase
+                    .from('levels')
+                    .insert(level)
+                if(error){
+                    res.status(500).send(error)
+                    return
+                }
+                var { data, error } = await supabase
+                    .rpc('updateRank')
+                if(error){
+                    res.status(500).send(error)
+                    return
+                }
+                res.status(200).send(level)
+            })
+    })
 })
-app.patch('/level/:id', async (req, res) => {
+app.patch('/level/:id', (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-	var level = {
-		name: null,
-		creator: null,
-		videoID: null,
-		minProgress: null,
-		flTop: null,
-		dlTop: null,
-		seaTop: null
-	}
-
-    if(data.dlTop == null){}
-    else if(data.dlTop < data.prevdlTop) data.dlTop -= 0.5
-    else if(data.dlTop > data.prevdlTop) data.dlTop += 0.5
-
-    if(data.flTop == null){}
-    else if(data.flTop < data.prevflTop) data.flTop -= 0.5
-    else if(data.flTop > data.prevflTop) data.flTop += 0.5
-
-    if(data.seaTop == null){}
-    else if(data.seaTop < data.prevseaTop) data.seaTop -= 0.5
-    else if(data.seaTop > data.prevseaTop) data.dlTop += 0.5
-    
-    for(const i in data){
-        if(i in level) {
-            level[i] = data[i]
+    checkAdmin(token).then((isAdmin) => {
+        if(!isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
         }
-    }
-    fetch(`https://gdbrowser.com/api/level/${id}`)
-        .then((res) => res.json())
-        .then(async (dat) => {
-            if(dat == -1){
-                res.status(400).send({
-                    'message': 'Level does not exist.'
-                })
-                return
+        var level = {
+            name: null,
+            creator: null,
+            videoID: null,
+            minProgress: null,
+            flTop: null,
+            dlTop: null,
+            seaTop: null
+        }
+
+        if(data.dlTop == null){}
+        else if(data.dlTop < data.prevdlTop) data.dlTop -= 0.5
+        else if(data.dlTop > data.prevdlTop) data.dlTop += 0.5
+
+        if(data.flTop == null){}
+        else if(data.flTop < data.prevflTop) data.flTop -= 0.5
+        else if(data.flTop > data.prevflTop) data.flTop += 0.5
+
+        if(data.seaTop == null){}
+        else if(data.seaTop < data.prevseaTop) data.seaTop -= 0.5
+        else if(data.seaTop > data.prevseaTop) data.dlTop += 0.5
+        
+        for(const i in data){
+            if(i in level) {
+                level[i] = data[i]
             }
-            level.name = dat.name
-            level.creator = dat.author
-            level.id = parseInt(id)
-            var { data, error } = await supabase
-                .from('levels')
-                .update(level)
-                .match({id:level.id})
-            if(error){
-                res.status(500).send(error)
-                return
-            }
-            var { data, error } = await supabase
-                .rpc('updateRank')
-            if(error){
-                res.status(500).send(error)
-                return
-            }
-            res.status(200).send(level)
-        })
+        }
+        fetch(`https://gdbrowser.com/api/level/${id}`)
+            .then((res) => res.json())
+            .then(async (dat) => {
+                if(dat == -1){
+                    res.status(400).send({
+                        'message': 'Level does not exist.'
+                    })
+                    return
+                }
+                level.name = dat.name
+                level.creator = dat.author
+                level.id = parseInt(id)
+                var { data, error } = await supabase
+                    .from('levels')
+                    .update(level)
+                    .match({id:level.id})
+                if(error){
+                    res.status(500).send(error)
+                    return
+                }
+                var { data, error } = await supabase
+                    .rpc('updateRank')
+                if(error){
+                    res.status(500).send(error)
+                    return
+                }
+                res.status(200).send(level)
+            })
+    })
 })
-app.delete('/level/:id', async (req, res) => {
+app.delete('/level/:id', (req, res) => {
     const { id } = req.params
     const { token } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
+    checkAdmin().then(async (isAdmin) => {
+        if(!isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
+        var { data, error } = await supabase
+            .from('submissions')
+            .delete()
+            .match({ levelid: id })
+        var { data, error } = await supabase
+            .from('records')
+            .delete()
+            .match({ levelid: id })
+        var { data, error } = await supabase
+            .from('levels')
+            .delete()
+            .match({id: id})
+        if(error){
+            res.status(500).send(error)
+            return
+        }
+        var { data, error } = await supabase
+            .rpc('updateRank')
+        res.status(200).send({
+            'message': 'ok'
         })
-        return
-    }
-    var { data, error } = await supabase
-        .from('submissions')
-        .delete()
-        .match({ levelid: id })
-    var { data, error } = await supabase
-        .from('records')
-        .delete()
-        .match({ levelid: id })
-    var { data, error } = await supabase
-        .from('levels')
-        .delete()
-        .match({id: id})
-    if(error){
-        res.status(500).send(error)
-        return
-    }
-    var { data, error } = await supabase
-        .rpc('updateRank')
-    res.status(200).send({
-        'message': 'ok'
     })
 })
 app.get('/levels/:list/page/:id', async (req, res) => {
@@ -312,51 +317,47 @@ app.get('/search/:id', async (req, res) => {
 })
 app.put('/record/:id', async (req, res) => {
     const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
+    checkAdmin(token).then((isAdmin) => {
+        if(!isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
     })
 })
 app.delete('/records/:id', async (req, res) => {
     const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
+    checkAdmin(token).then((isAdmin) => {
+        if(!isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
     })
 })
 app.put('/player/:id', async (req, res) => {
     const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
+    checkAdmin(token).then((isAdmin) => {
+        if(!isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
     })
 })
 
 app.put('/admin/mergePlayer', async (req, res) => {
     const { token, data } = req.body
-    if(!isAdmin(token)) {
-        res.status(401).send({
-            'message': 'Token Invalid'
-        })
-        return
-    }
-    res.status(200).send({
-        'message': 'ok'
+    checkAdmin(token).then((isAdmin) => {
+        if(!isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
     })
 })
 
