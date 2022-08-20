@@ -426,6 +426,50 @@ app.post('/player', async (req, res) => {
         })
     })
 })
+app.delete('/submission/:id', async (req, res) => {
+    var { id } = req.params
+    var { token } = req.body
+    checkAdmin(token).then( async (user) => {
+        var { data, error } = await supabase
+            .from('submissions')
+            .delete()
+            .match({ id: id })
+        if(error){
+            res.status(500).send(error)
+            return
+        }
+        res.status(200).send({
+            message: 'ok'
+        })
+    })
+})
+app.post('/submission', async (req, res) => {
+    var { token, data } = req.body
+    item = data
+    checkAdmin(token).then( async (user) => {
+        var { data, error } = await supabase
+            .from('submissions')
+            .delete()
+            .match({ id: item.id })
+        delete item.id
+        delete item.comment
+        delete item.players
+        delete item.levels
+        var { data, error } = await supabase
+            .from('records')
+            .insert(item)
+        if(error){
+            res.status(500).send(error)
+            return
+        }
+        res.status(200).send({
+            message: 'ok'
+        })
+        var { data, error } = await supabase
+            .rpc('updateRank')
+    })
+})
+
 app.put('/admin/mergePlayer', async (req, res) => {
     const { token, data } = req.body
     checkAdmin(token).then((user) => {

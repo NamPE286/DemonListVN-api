@@ -6,6 +6,7 @@
 |:---------------|:----------------------------------
 | `levelID`         | `number`
 | `recordID`        | `number`
+| `submissionID`    | `number`
 | `userID`          | `uuid-v4`
 | `list`            | `fl (VN only)` `dl (VN only)` `sea`
 | `orderBy`         | `timestamp` `dlPt` `flPt` `levelid`
@@ -237,5 +238,29 @@
   `DELETE /record/[recordID]`
 ### Header
     {
+      "token":""
+    }
+
+## Reject/Delete a submission
+### Request
+  `DELETE /submission/[submissionID]`
+### Header
+    {
       "token": ""
+    }
+
+## Accept a submission
+### Request
+  `POST /submission`
+    {
+      "token": "",
+      "data":{
+        "levelid": null,
+        "userid": null,
+        "videoLink": '',
+        "refreshRate": null,
+        "mobile": false,
+        "progress": null,
+        "timestamp": null
+      }
     }
