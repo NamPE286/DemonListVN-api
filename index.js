@@ -325,11 +325,11 @@ app.put('/record', async (req, res) => {
             return
         }
         var { data, error } = await supabase
-            .from('records')
-            .select('players(country)')
-            .match({id: record.id})
+            .from('players')
+            .select('country')
+            .match({uid: record.userid})
             .single()
-        if(data.players.country != user.country){
+        if(data.country != user.country){
             res.status(403).send({
                 'message':'Country does not match'
             })
@@ -361,11 +361,11 @@ app.delete('/record/:id', async (req, res) => {
             return
         }
         var { data, error } = await supabase
-            .from('players')
-            .select('country')
-            .match({uid: id})
+            .from('records')
+            .select('players(country)')
+            .match({id: id})
             .single()
-        if(data.country != user.country){
+        if(data.players.country != user.country){
             res.status(403).send({
                 'message':'Country does not match'
             })
