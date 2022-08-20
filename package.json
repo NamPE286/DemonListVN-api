@@ -19,7 +19,8 @@
     "node": "16.x"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon ."
   },
   "repository": {
     "type": "git",

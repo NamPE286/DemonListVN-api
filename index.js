@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
 async function checkAdmin(token){
-    if(process.env.DEVELOPMENT_SERVER) return true
     try{
         jwt.verify(token, process.env.JWT_SECRET)
         user = jwt.decode(token)
@@ -326,20 +325,22 @@ app.put('/record', async (req, res) => {
             return
         }
         var { data, error } = await supabase
-            .from('players')
-            .select('country')
-            .match({uid: record.id})
+            .from('records')
+            .select('players(country)')
+            .match({id: record.id})
             .single()
-        if(data != user.country){
+        if(data.players.country != user.country){
             res.status(403).send({
                 'message':'Country does not match'
             })
             return
         }
+        console.log(record.id)
 		var { data, error } = await supabase
 			.from('records')
 			.upsert(record)
         record = data
+        console.log(record)
 		if(error){
 			res.status(500).send(error)
             console.log(error)
@@ -364,7 +365,7 @@ app.delete('/record/:id', async (req, res) => {
             .select('country')
             .match({uid: id})
             .single()
-        if(data != user.country){
+        if(data.country != user.country){
             res.status(403).send({
                 'message':'Country does not match'
             })
