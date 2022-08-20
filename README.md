@@ -10,10 +10,11 @@
 | `list`            | `fl (VN only)` `dl (VN only)` `sea`
 | `orderBy`         | `timestamp` `dlPt` `flPt` `levelid`
 | `pageNumber`      | `number`
+| `country`         | `alpha-2 code` `can be blank`
 
 ## Get a level's info and records
 ### Request
-  `GET /level/[levelID]`
+  `GET /level/[levelID]/[country]`
 
 ### Response
 

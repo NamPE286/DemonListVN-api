@@ -27,7 +27,7 @@ app.use(express.json())
 app.use(cors())
 
 app.get('/level/:id', async (req, res) => {
-    const { id } = req.params
+    const { id, country } = req.params
     const d = {
         data:{},
         records:[]
@@ -50,6 +50,35 @@ app.get('/level/:id', async (req, res) => {
         .order('progress', {ascending: false})
         .order('timestamp', {ascending: true})
     d.records = data
+    res.status(200).send(d)
+})
+app.get('/level/:id/:country', async (req, res) => {
+    const { id, country } = req.params
+    const d = {
+        data:{},
+        records:[]
+    }
+    var { data, error } = await supabase
+        .from('levels')
+        .select('*')
+        .eq('id', id)
+    if(data.length == 0){
+        res.status(400).send({
+            message: 'Level does not exists'
+        })
+        return
+    }
+    d.data = data[0]
+    d.records = []
+    var { data, error } = await supabase
+        .from('records')
+        .select('*, players(name, country)')
+        .eq('levelid', id)
+        .order('progress', {ascending: false})
+        .order('timestamp', {ascending: true})
+    for(const i of data){
+        if(i.players.country == country) d.records.push(i)
+    }
     res.status(200).send(d)
 })
 app.post('/level/:id', (req, res) => {
