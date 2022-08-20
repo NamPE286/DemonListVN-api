@@ -430,6 +430,24 @@ app.delete('/submission/:id', async (req, res) => {
     var { id } = req.params
     var { token } = req.body
     checkAdmin(token).then( async (user) => {
+        if(!user.isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
+        var { data, error } = await supabase
+            .from('submissions')
+            .select('players(country)')
+            .match({id: id})
+            .single()
+        console.log(id, data, error)
+        if(data.players.country != user.country){
+            res.status(403).send({
+                'message':'Country does not match'
+            })
+            return
+        }
         var { data, error } = await supabase
             .from('submissions')
             .delete()
@@ -447,6 +465,23 @@ app.post('/submission', async (req, res) => {
     var { token, data } = req.body
     item = data
     checkAdmin(token).then( async (user) => {
+        if(!user.isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
+        var { data, error } = await supabase
+            .from('players')
+            .select('country')
+            .match({uid: item.userid})
+            .single()
+        if(data.country != user.country){
+            res.status(403).send({
+                'message':'Country does not match'
+            })
+            return
+        }
         var { data, error } = await supabase
             .from('submissions')
             .delete()
