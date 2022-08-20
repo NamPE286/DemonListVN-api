@@ -215,6 +215,30 @@
       }
     }
 
+## Edit a player's info
+### Request
+  `PATCH /player/[userID]`
+
+### Header
+    
+    {
+      "token":"",
+      "data":{
+        "id": 10,
+        "name": "Zophirux",
+        "email": "vnpropvpabc@gmail.com",
+        "avatar": "https://media.discordapp.net/attachments/747355506913443853/1001756936984866886/baqua_2.PNG",
+        "facebook": "https://www.facebook.com/profile.php?id=100057368619265",
+        "youtube": "https://www.youtube.com/c/Zophirux",
+        "discord": "Zophirux#8242",
+        "totalFLpt": 2647.63,
+        "totalDLpt": 387.36,
+        "flrank": 1,
+        "dlrank": 14,
+        "uid": "3a24c91a-d45f-4e93-83f6-569858aaa35b"
+      }
+    }
+
 ## Add/Edit a record
 ### Request
   `PUT /record`
@@ -252,6 +276,7 @@
 ## Accept a submission
 ### Request
   `POST /submission`
+### Header
     {
       "token": "",
       "data":{

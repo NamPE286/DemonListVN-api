@@ -23,6 +23,17 @@ async function checkAdmin(token){
     }
 }
 
+function checkUser(token, uid){
+    try{
+        jwt.verify(token, process.env.JWT_SECRET)
+        user = jwt.decode(token)
+        return user.sub == uid
+    }
+    catch(err){
+        return false
+    }
+}
+
 app.use(express.json())
 app.use(cors())
 
@@ -299,6 +310,21 @@ app.get('/players/:list/page/:id', async (req, res) => {
         res.status(400).send(error)
         return
     }
+    res.status(200).send(data)
+})
+app.patch('/player/:id', async (req, res) => {
+    const { id } = req.params
+    var { token, data } = req.body
+    if(!checkUser(token, id)){
+        res.status(403).send({})
+        return
+    }
+    user = jwt.decode(token)
+    delete data.isAdmin
+    var { data, error } = await supabase
+        .from('players')
+        .update(a)
+        .match({ uid: user.sub })
     res.status(200).send(data)
 })
 app.get('/search/:id', async (req, res) => {
