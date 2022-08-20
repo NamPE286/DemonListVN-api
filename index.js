@@ -412,7 +412,20 @@ app.delete('/record/:id', async (req, res) => {
         res.status(200).send({})
     })
 })
-
+app.post('/player', async (req, res) => {
+    var { token, data } = req.body
+    player = data
+    checkAdmin(token).then( async (user) => {
+        var { data, error } = await supabase.from("players").insert(player)
+        if(error){
+            res.status(500).send(error)
+            return
+        }
+        res.status(200).send({
+            message: 'ok'
+        })
+    })
+})
 app.put('/admin/mergePlayer', async (req, res) => {
     const { token, data } = req.body
     checkAdmin(token).then((user) => {

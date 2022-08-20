@@ -204,6 +204,16 @@
       ...
     ]
 
+## Add a player
+  `POST /player`
+### Header
+    {
+      "token":"",
+      "data":{
+        "name": ""
+      }
+    }
+
 ## Add/Edit a record
 ### Request
   `PUT /record`
