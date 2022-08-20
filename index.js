@@ -320,14 +320,22 @@ app.put('/record', async (req, res) => {
     record = data
     checkAdmin(token).then( async (user) => {
         if(!user.isAdmin) {
-            console.log(1)
             res.status(401).send({
                 'message': 'Token Invalid'
             })
             return
         }
-        console.log(2)
-        console.log(record)
+        var { data, error } = await supabase
+            .from('players')
+            .select('country')
+            .match({uid: record.id})
+            .single()
+        if(data != user.country){
+            res.status(403).send({
+                'message':'Country does not match'
+            })
+            return
+        }
 		var { data, error } = await supabase
 			.from('records')
 			.upsert(record)
@@ -348,6 +356,17 @@ app.delete('/record/:id', async (req, res) => {
         if(!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
+            })
+            return
+        }
+        var { data, error } = await supabase
+            .from('players')
+            .select('country')
+            .match({uid: id})
+            .single()
+        if(data != user.country){
+            res.status(403).send({
+                'message':'Country does not match'
             })
             return
         }
