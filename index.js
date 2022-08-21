@@ -367,7 +367,7 @@ app.get('/search/:id', async (req, res) => {
             .from('levels')
             .select('*')
             .eq('id', id)
-        res.status(200).send([data])
+        res.status(200).send([data, []])
     }
 })
 app.put('/record', async (req, res) => {
