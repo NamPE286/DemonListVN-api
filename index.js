@@ -315,6 +315,7 @@ app.get('/players/:list/page/:id', async (req, res) => {
 app.patch('/player/:id', async (req, res) => {
     const { id } = req.params
     var { token, data } = req.body
+    a = data
     if(!checkUser(token, id)){
         res.status(403).send({})
         return
