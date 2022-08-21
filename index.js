@@ -443,6 +443,12 @@ app.post('/player', async (req, res) => {
     var { token, data } = req.body
     player = data
     checkAdmin(token).then( async (user) => {
+        if(!user.isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
         var { data, error } = await supabase.from("players").insert(player)
         if(error){
             res.status(500).send(error)
