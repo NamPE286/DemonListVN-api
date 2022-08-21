@@ -7,6 +7,8 @@ require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
+const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
+
 async function checkAdmin(token){
     try{
         jwt.verify(token, process.env.JWT_SECRET)
@@ -322,6 +324,20 @@ app.patch('/player/:id', async (req, res) => {
     }
     user = jwt.decode(token)
     delete data.isAdmin
+    if(data.name.length > 20){
+        res.status(400).send({
+            message:'Too long name (max 20 characters)'
+        })
+        return
+    }
+    for(let i = 0; i < data.name.length; i++){
+        if(invalidChar.has(data.name[i])){
+            res.status(400).send({
+                message: 'Invalid name'
+            })
+            return
+        }
+    }
     var { data, error } = await supabase
         .from('players')
         .update(a)
