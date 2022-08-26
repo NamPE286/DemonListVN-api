@@ -58,8 +58,9 @@ app.get('/level/:id', async (req, res) => {
     d.data = data[0]
     var { data, error } = await supabase
         .from('records')
-        .select('*, players(name)')
+        .select('*, players(name), players(isHidden)')
         .eq('levelid', id)
+        .eq('isHidden', false)
         .order('progress', {ascending: false})
         .order('timestamp', {ascending: true})
     d.records = data
@@ -360,11 +361,12 @@ app.get('/search/:id', async (req, res) => {
         }
         var { data, error } = await supabase
             .from('players')
-            .select('name, uid')
+            .select('name, uid, isHidden')
             .textSearch('name', `'${id}'`, {
                 type: 'websearch',
                 config: 'english'
             })
+            .eq('isHidden', false)
         var players = []
         for (var i = 0; i < data.length; i++) {
             players.push({
