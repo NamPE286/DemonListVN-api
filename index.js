@@ -344,6 +344,7 @@ app.patch('/player/:id', async (req, res) => {
         .update(a)
         .match({ uid: user.sub })
     res.status(200).send(data)
+    var { data, error } = await supabase.rpc('updateRank')
 })
 app.get('/search/:id', async (req, res) => {
     var { id } = req.params
