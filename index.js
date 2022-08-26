@@ -58,11 +58,12 @@ app.get('/level/:id', async (req, res) => {
     d.data = data[0]
     var { data, error } = await supabase
         .from('records')
-        .select('*, players(name), players(isHidden)')
+        .select('*, players!inner(name, isHidden)')
         .eq('levelid', id)
-        .eq('isHidden', false)
+        .eq('players.isHidden', false)
         .order('progress', {ascending: false})
         .order('timestamp', {ascending: true})
+    console.log(data, error)
     d.records = data
     res.status(200).send(d)
 })
