@@ -98,13 +98,13 @@ app.get('/level/:id/:country', async (req, res) => {
 })
 app.post('/level/:id', (req, res) => {
     const { id } = req.params
-    const { token, data } = req.body
+    var { token, data } = req.body
     checkAdmin(token).then(async (user) => {
         if(!user.isAdmin) {
-            res.status(401).send({
-                'message': 'Token Invalid'
-            })
-            return
+            data = {
+                name : data.name,
+                creator : data.creator
+            }
         }
         var level = {
             name: null,
