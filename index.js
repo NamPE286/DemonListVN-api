@@ -206,13 +206,29 @@ app.patch('/level/:id', (req, res) => {
                 if(!level.creator) level.creator = dat.author
                 if(level.minProgress < 1) level.minProgress = 100
                 level.id = parseInt(id)
-                var { data, error } = await supabase
-                    .from('levels')
-                    .update(level)
-                    .match({id:level.id})
-                if(error){
-                    res.status(500).send(error)
-                    return
+                if(dlTop == null && flTop == null && seaTop == null){
+                    var { data, error } = await supabase
+                    .from('submissions')
+                    .delete()
+                    .match({ levelid: level.id })
+                    var { data, error } = await supabase
+                        .from('records')
+                        .delete()
+                        .match({ levelid: level.id })
+                    var { data, error } = await supabase
+                        .from('levels')
+                        .delete()
+                        .match({id: level.id})
+                }
+                else{
+                    var { data, error } = await supabase
+                        .from('levels')
+                        .update(level)
+                        .match({id:level.id})
+                    if(error){
+                        res.status(500).send(error)
+                        return
+                    }
                 }
                 var { data, error } = await supabase
                     .rpc('updateRank')
@@ -222,37 +238,6 @@ app.patch('/level/:id', (req, res) => {
                 }
                 res.status(200).send(level)
             })
-    })
-})
-app.delete('/level/:id', (req, res) => {
-    const { id } = req.params
-    const { token } = req.body
-    checkAdmin(token).then( async (user) => {
-        if(!user.isAdmin) {
-            res.status(401).send({
-                'message': 'Token Invalid'
-            })
-            return
-        }
-        var { data, error } = await supabase
-            .from('submissions')
-            .delete()
-            .match({ levelid: id })
-        var { data, error } = await supabase
-            .from('records')
-            .delete()
-            .match({ levelid: id })
-        var { data, error } = await supabase
-            .from('levels')
-            .delete()
-            .match({id: id})
-        if(error){
-            res.status(500).send(error)
-            return
-        }
-        var { data, error } = await supabase
-            .rpc('updateRank')
-        res.status(200).send({})
     })
 })
 app.get('/levels/:list/page/:id', async (req, res) => {
