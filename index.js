@@ -206,7 +206,7 @@ app.patch('/level/:id', (req, res) => {
                 if(!level.creator) level.creator = dat.author
                 if(level.minProgress < 1) level.minProgress = 100
                 level.id = parseInt(id)
-                if(!dlTop && !flTop && !seaTop){
+                if(!level.dlTop && !level.flTop && !level.seaTop){
                     var { data, error } = await supabase
                     .from('submissions')
                     .delete()
