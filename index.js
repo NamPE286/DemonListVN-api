@@ -254,6 +254,33 @@ app.get('/levels/:list/page/:id', async (req, res) => {
     }
     res.status(200).send(data)
 })
+app.get('/levels/:list/page/:id/:uid', async (req, res) => {
+    const { id, list, uid } = req.params
+    var { data, error } = await supabase
+        .from('levels')
+        .select('*')
+        .order(`${list}Top`, { ascending: true })
+        .range((id - 1) * 200, id * 200 - 1)
+        .not(`${list}Top`, 'is', null)
+    if(error){
+        res.status(400).send(error)
+        return
+    }
+    var result = data
+    var { data, error } = await supabase
+        .from('records')
+        .select('userid, levelid, progress')
+        .eq('userid', uid)
+    var mp = {}
+    for(const i of data){
+        mp[i.levelid] = i
+    }
+    for(const i of result){
+        i['progress'] = 0
+        if(mp.hasOwnProperty(i.id)) i['progress'] = mp[i.id].progress
+    }
+    res.status(200).send(result)
+})
 app.get('/player/:id', async (req, res) =>{
     const { id } = req.params
     var { data, error } = await supabase
