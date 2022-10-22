@@ -2,6 +2,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^1.35.6",
     "autocorrect": "^1.2.0",
+    "base64-arraybuffer": "^1.0.2",
     "cors": "^2.8.5",
     "cross-fetch": "^3.1.5",
     "dotenv": "^16.0.1",

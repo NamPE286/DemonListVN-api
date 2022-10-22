@@ -272,20 +272,3 @@
     {
       "token": ""
     }
-
-## Accept a submission
-### Request
-  `POST /submission`
-### Header
-    {
-      "token": "",
-      "data":{
-        "levelid": null,
-        "userid": null,
-        "videoLink": '',
-        "refreshRate": null,
-        "mobile": false,
-        "progress": null,
-        "timestamp": null
-      }
-    }

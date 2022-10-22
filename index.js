@@ -6,7 +6,6 @@ const fetch = require('cross-fetch')
 require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
-
 const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
 
 async function checkAdmin(token){
@@ -66,6 +65,19 @@ app.get('/level/:id', async (req, res) => {
     console.log(data, error)
     d.records = data
     res.status(200).send(d)
+})
+app.delete('level/:id', async (req, res) => {
+    const { id } = req.params
+    const { token } = req.body
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+        }
+        await supabase.from("submissions").delete().match({ levelid: item.id });
+        await supabase.from('levels').delete().match({id: id})
+    })
 })
 app.get('/level/:id/:country', async (req, res) => {
     const { id, country } = req.params
@@ -423,7 +435,17 @@ app.put('/record', async (req, res) => {
             })
             return
         }
-        console.log(record.id)
+        var { data, error } = await supabase
+            .from('submissions')
+            .select('userid, levelid')
+            .match({userid: record.userid, levelid: levelid})
+        var { data, error } = await supabase
+            .from('submissions')
+            .delete()
+            .match({ userid: record.userid, levelid: levelid })
+        delete record.comment
+        delete record.players
+        delete record.levels 
 		var { data, error } = await supabase
 			.from('records')
 			.upsert(record)
@@ -524,61 +546,6 @@ app.delete('/submission/:id', async (req, res) => {
         res.status(200).send({
             message: 'ok'
         })
-    })
-})
-app.post('/submission', async (req, res) => {
-    var { token, data } = req.body
-    item = data
-    checkAdmin(token).then( async (user) => {
-        if(!user.isAdmin) {
-            res.status(401).send({
-                'message': 'Token Invalid'
-            })
-            return
-        }
-        var { data, error } = await supabase
-            .from('players')
-            .select('country')
-            .match({uid: item.userid})
-            .single()
-        if(data.country != user.country){
-            res.status(403).send({
-                'message':'Country does not match'
-            })
-            return
-        }
-        var { data, error } = await supabase
-            .from('submissions')
-            .delete()
-            .match({ id: item.id })
-        delete item.id
-        delete item.comment
-        delete item.players
-        delete item.levels
-        var { data, error } = await supabase
-            .from('records')
-            .insert(item)
-        if(error){
-            res.status(500).send(error)
-            return
-        }
-        res.status(200).send({
-            message: 'ok'
-        })
-        var { data, error } = await supabase
-            .rpc('updateRank')
-    })
-})
-
-app.put('/admin/mergePlayer', async (req, res) => {
-    const { token, data } = req.body
-    checkAdmin(token).then((user) => {
-        if(!user.isAdmin) {
-            res.status(401).send({
-                'message': 'Token Invalid'
-            })
-            return
-        }
     })
 })
 
