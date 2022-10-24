@@ -7,6 +7,7 @@
     "cross-fetch": "^3.1.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "gd-browser-api": "^1.0.1",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.1.2",
     "node-fetch": "^3.2.10",

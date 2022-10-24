@@ -8,6 +8,8 @@ const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
 
+const { getLevel } = require('gd-browser-api')
+
 async function checkAdmin(token){
     try{
         jwt.verify(token, process.env.JWT_SECRET)
@@ -55,6 +57,14 @@ app.get('/level/:id', async (req, res) => {
         return
     }
     d.data = data[0]
+    const lvapi = await getLevel(id)
+    d.data['difficulty'] = lvapi.difficulty
+    d.data['description'] = lvapi.description
+    d.data['downloads'] = lvapi.downloads
+    d.data['likes'] = lvapi.likes
+    if(lvapi.disliked) d.data.likes *= -1
+    d.data['length'] = lvapi.length
+    d.data['pointercrateRank'] = lvapi.demonList
     var { data, error } = await supabase
         .from('records')
         .select('*, players!inner(name, isHidden)')
@@ -62,7 +72,6 @@ app.get('/level/:id', async (req, res) => {
         .eq('players.isHidden', false)
         .order('progress', {ascending: false})
         .order('timestamp', {ascending: true})
-    console.log(data, error)
     d.records = data
     res.status(200).send(d)
 })
