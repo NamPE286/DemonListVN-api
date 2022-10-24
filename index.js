@@ -65,6 +65,8 @@ app.get('/level/:id', async (req, res) => {
     if(lvapi.disliked) d.data.likes *= -1
     d.data['length'] = lvapi.length
     d.data['pointercrateRank'] = lvapi.demonList
+    d.data['coins'] = lvapi.coins
+    d.data['verifiedCoins'] = lvapi.verifiedCoins
     var { data, error } = await supabase
         .from('records')
         .select('*, players!inner(name, isHidden)')
