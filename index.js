@@ -8,7 +8,82 @@ const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
 
-const { getLevel } = require('gd-browser-api')
+const GDClient = require('geometry-dash-api');
+
+const client = new GDClient({
+    userName: 'dummy',
+    password: 'dummy'
+});
+async function getLevel1(id, count = 0){
+    if (count > 2) return {
+        levelID: null,
+        name: null,
+        desc: null,
+        version: null,
+        creatorUserID: null,
+        diff: null,
+        downloads: null,
+        likes: null,
+        track: null,
+        gameVersion: null,
+        demonDiff: null,
+        stars: null,
+        isFeatured: null,
+        isEpic: null,
+        length: null,
+        original: null,
+        songID: null,
+        coins: null,
+        requestedStars: null,
+        isLDM: null,
+        password: null
+    }
+    const level = await client.api.levels.getById({ levelID: parseInt(id) })
+    level.desc = atob(level.desc)
+    console.log(level)
+    if(typeof level.name == undefined) return await getLevel(id, count + 1)
+    level['difficulty'] = level.diff
+    if(level.stars == 10){
+        if (level.diff == 'Easy') level.difficulty = 'Easy Demon'
+        else if (level.diff == 'Normal') level.difficulty = 'Medium Demon'
+        else if(level.diff == 'Hard') level.difficulty = 'Hard Demon'
+        else if (level.diff == 'Harder') level.difficulty = 'Insane Demon'
+        else level.difficulty = 'Extreme Demon'
+    }
+    level.verifiedCoins = true
+    level.length = level.length[0].toUpperCase() + level.length.slice(1).toLowerCase()
+    return level
+}
+async function getLevel(id){
+    try{
+        return await getLevel1(id)
+    }
+    catch{
+        return {
+            levelID: null,
+            name: null,
+            desc: null,
+            version: null,
+            creatorUserID: null,
+            diff: null,
+            downloads: null,
+            likes: null,
+            track: null,
+            gameVersion: null,
+            demonDiff: null,
+            stars: null,
+            isFeatured: null,
+            isEpic: null,
+            length: null,
+            original: null,
+            songID: null,
+            coins: null,
+            requestedStars: null,
+            isLDM: null,
+            password: null
+        }
+    }
+}
 
 async function checkAdmin(token) {
     try {
@@ -59,7 +134,7 @@ app.get('/level/:id', async (req, res) => {
     d.data = data[0]
     const lvapi = await getLevel(id)
     d.data['difficulty'] = lvapi.difficulty
-    d.data['description'] = lvapi.description
+    d.data['description'] = lvapi.desc
     d.data['downloads'] = lvapi.downloads
     d.data['likes'] = lvapi.likes
     if (lvapi.disliked) d.data.likes *= -1

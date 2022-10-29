@@ -8,6 +8,7 @@
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "gd-browser-api": "^1.0.1",
+    "geometry-dash-api": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.1.2",
     "node-fetch": "^3.2.10",
