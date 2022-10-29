@@ -10,8 +10,8 @@ const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
 
 const { getLevel } = require('gd-browser-api')
 
-async function checkAdmin(token){
-    try{
+async function checkAdmin(token) {
+    try {
         jwt.verify(token, process.env.JWT_SECRET)
         user = jwt.decode(token)
         var { data, error } = await supabase
@@ -21,18 +21,18 @@ async function checkAdmin(token){
             .single()
         return data
     }
-    catch(err){
+    catch (err) {
         return false
     }
 }
 
-function checkUser(token, uid){
-    try{
+function checkUser(token, uid) {
+    try {
         jwt.verify(token, process.env.JWT_SECRET)
         user = jwt.decode(token)
         return user.sub == uid
     }
-    catch(err){
+    catch (err) {
         return false
     }
 }
@@ -43,14 +43,14 @@ app.use(cors())
 app.get('/level/:id', async (req, res) => {
     const { id, country } = req.params
     const d = {
-        data:{},
-        records:[]
+        data: {},
+        records: []
     }
     var { data, error } = await supabase
         .from('levels')
         .select('*')
         .eq('id', id)
-    if(data.length == 0){
+    if (data.length == 0) {
         res.status(400).send({
             message: 'Level does not exists'
         })
@@ -62,9 +62,8 @@ app.get('/level/:id', async (req, res) => {
     d.data['description'] = lvapi.description
     d.data['downloads'] = lvapi.downloads
     d.data['likes'] = lvapi.likes
-    if(lvapi.disliked) d.data.likes *= -1
+    if (lvapi.disliked) d.data.likes *= -1
     d.data['length'] = lvapi.length
-    d.data['pointercrateRank'] = lvapi.demonList
     d.data['coins'] = lvapi.coins
     d.data['verifiedCoins'] = lvapi.verifiedCoins
     var { data, error } = await supabase
@@ -72,8 +71,8 @@ app.get('/level/:id', async (req, res) => {
         .select('*, players!inner(name, isHidden)')
         .eq('levelid', id)
         .eq('players.isHidden', false)
-        .order('progress', {ascending: false})
-        .order('timestamp', {ascending: true})
+        .order('progress', { ascending: false })
+        .order('timestamp', { ascending: true })
     d.records = data
     res.status(200).send(d)
 })
@@ -87,20 +86,20 @@ app.delete('level/:id', async (req, res) => {
             })
         }
         await supabase.from("submissions").delete().match({ levelid: item.id });
-        await supabase.from('levels').delete().match({id: id})
+        await supabase.from('levels').delete().match({ id: id })
     })
 })
 app.get('/level/:id/:country', async (req, res) => {
     const { id, country } = req.params
     const d = {
-        data:{},
-        records:[]
+        data: {},
+        records: []
     }
     var { data, error } = await supabase
         .from('levels')
         .select('*')
         .eq('id', id)
-    if(data.length == 0){
+    if (data.length == 0) {
         res.status(400).send({
             message: 'Level does not exists'
         })
@@ -112,10 +111,10 @@ app.get('/level/:id/:country', async (req, res) => {
         .from('records')
         .select('*, players(name, country)')
         .eq('levelid', id)
-        .order('progress', {ascending: false})
-        .order('timestamp', {ascending: true})
-    for(const i of data){
-        if(i.players.country == country) d.records.push(i)
+        .order('progress', { ascending: false })
+        .order('timestamp', { ascending: true })
+    for (const i of data) {
+        if (i.players.country == country) d.records.push(i)
     }
     res.status(200).send(d)
 })
@@ -123,10 +122,10 @@ app.post('/level/:id', (req, res) => {
     const { id } = req.params
     var { token, data } = req.body
     checkAdmin(token).then(async (user) => {
-        if(!user.isAdmin) {
+        if (!user.isAdmin) {
             data = {
-                name : data.name,
-                creator : data.creator
+                name: data.name,
+                creator: data.creator
             }
         }
         var level = {
@@ -138,49 +137,46 @@ app.post('/level/:id', (req, res) => {
             dlTop: null,
             seaTop: null
         }
-        for(const i in data){
-            if(i in level) {
+        for (const i in data) {
+            if (i in level) {
                 level[i] = data[i]
             }
         }
-        if(level.flTop != null) level.flTop -= 0.5
-        if(level.dlTop != null) level.dlTop -= 0.5
-        if(level.seaTop != null) level.seaTop -= 0.5
-        fetch(`https://gdbrowser.com/api/level/${id}`)
-            .then((res) => res.json())
-            .then(async (dat) => {
-                if(dat == -1){
-                    res.status(400).send({
-                        'message': 'Level does not exist.'
-                    })
-                    return
-                }
-                level.name = dat.name
-                if(!level.creator) level.creator = dat.author
-                if(level.minProgress < 1) level.minProgress = 100
-                level.id = parseInt(id)
-                var { data, error } = await supabase
-                    .from('levels')
-                    .insert(level)
-                if(error){
-                    res.status(500).send(error)
-                    return
-                }
-                var { data, error } = await supabase
-                    .rpc('updateRank')
-                if(error){
-                    res.status(500).send(error)
-                    return
-                }
-                res.status(200).send(level)
+        if (level.flTop != null) level.flTop -= 0.5
+        if (level.dlTop != null) level.dlTop -= 0.5
+        if (level.seaTop != null) level.seaTop -= 0.5
+        const dat = await getLevel(id)
+        if (dat == -1) {
+            res.status(400).send({
+                'message': 'Level does not exist.'
             })
+            return
+        }
+        level.name = dat.name
+        if (!level.creator) level.creator = dat.author
+        if (level.minProgress < 1) level.minProgress = 100
+        level.id = parseInt(id)
+        var { data, error } = await supabase
+            .from('levels')
+            .insert(level)
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
+        var { data, error } = await supabase
+            .rpc('updateRank')
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
+        res.status(200).send(level)
     })
 })
 app.patch('/level/:id', (req, res) => {
     const { id } = req.params
     const { token, data } = req.body
     checkAdmin(token).then(async (user) => {
-        if(!user.isAdmin) {
+        if (!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -196,73 +192,71 @@ app.patch('/level/:id', (req, res) => {
             seaTop: null
         }
 
-        if(data.dlTop == null){}
-        else if(data.prevdlTop == null) data.seaTop -= 0.5
-        else if(data.dlTop < data.prevdlTop) data.dlTop -= 0.5
-        else if(data.dlTop > data.prevdlTop) data.dlTop += 0.5
+        if (data.dlTop == null) { }
+        else if (data.prevdlTop == null) data.seaTop -= 0.5
+        else if (data.dlTop < data.prevdlTop) data.dlTop -= 0.5
+        else if (data.dlTop > data.prevdlTop) data.dlTop += 0.5
 
-        if(data.flTop == null){}
-        else if(data.prevflTop == null) data.seaTop -= 0.5
-        else if(data.flTop < data.prevflTop) data.flTop -= 0.5
-        else if(data.flTop > data.prevflTop) data.flTop += 0.5
+        if (data.flTop == null) { }
+        else if (data.prevflTop == null) data.seaTop -= 0.5
+        else if (data.flTop < data.prevflTop) data.flTop -= 0.5
+        else if (data.flTop > data.prevflTop) data.flTop += 0.5
 
-        if(data.seaTop == null){}
-        else if(data.prevseaTop == null) data.seaTop -= 0.5
-        else if(data.seaTop < data.prevseaTop) data.seaTop -= 0.5
-        else if(data.seaTop > data.prevseaTop) data.dlTop += 0.5
-        
-        for(const i in data){
-            if(i in level) {
+        if (data.seaTop == null) { }
+        else if (data.prevseaTop == null) data.seaTop -= 0.5
+        else if (data.seaTop < data.prevseaTop) data.seaTop -= 0.5
+        else if (data.seaTop > data.prevseaTop) data.dlTop += 0.5
+
+        for (const i in data) {
+            if (i in level) {
                 level[i] = data[i]
             }
         }
-        fetch(`https://gdbrowser.com/api/level/${id}`)
-            .then((res) => res.json())
-            .then(async (dat) => {
-                if(dat == -1){
-                    res.status(400).send({
-                        'message': 'Level does not exist.'
-                    })
-                    return
-                }
-                level.name = dat.name
-                if(!level.creator) level.creator = dat.author
-                if(level.minProgress < 1) level.minProgress = 100
-                level.id = parseInt(id)
-                if(!level.dlTop && !level.flTop && !level.seaTop){
-                    var { data, error } = await supabase
-                    .from('submissions')
-                    .delete()
-                    .match({ levelid: level.id })
-                    var { data, error } = await supabase
-                        .from('records')
-                        .delete()
-                        .match({ levelid: level.id })
-                    var { data, error } = await supabase
-                        .from('levels')
-                        .delete()
-                        .match({id: level.id})
-                }
-                else{
-                    var { data, error } = await supabase
-                        .from('levels')
-                        .update(level)
-                        .match({id:level.id})
-                    if(error){
-                        res.status(500).send(error)
-                        return
-                    }
-                }
-                var { data, error } = await supabase
-                    .rpc('updateRank')
-                if(error){
-                    res.status(500).send(error)
-                    return
-                }
-                res.status(200).send(level)
+        const dat = await getLevel(id)
+        if (dat == -1) {
+            res.status(400).send({
+                'message': 'Level does not exist.'
             })
+            return
+        }
+        level.name = dat.name
+        if (!level.creator) level.creator = dat.author
+        if (level.minProgress < 1) level.minProgress = 100
+        level.id = parseInt(id)
+        if (!level.dlTop && !level.flTop && !level.seaTop) {
+            var { data, error } = await supabase
+                .from('submissions')
+                .delete()
+                .match({ levelid: level.id })
+            var { data, error } = await supabase
+                .from('records')
+                .delete()
+                .match({ levelid: level.id })
+            var { data, error } = await supabase
+                .from('levels')
+                .delete()
+                .match({ id: level.id })
+        }
+        else {
+            var { data, error } = await supabase
+                .from('levels')
+                .update(level)
+                .match({ id: level.id })
+            if (error) {
+                res.status(500).send(error)
+                return
+            }
+        }
+        var { data, error } = await supabase
+            .rpc('updateRank')
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
+        res.status(200).send(level)
     })
 })
+
 app.get('/levels/:list/page/:id', async (req, res) => {
     const { id, list } = req.params
     var { data, error } = await supabase
@@ -271,7 +265,7 @@ app.get('/levels/:list/page/:id', async (req, res) => {
         .order(`${list}Top`, { ascending: true })
         .range((id - 1) * 200, id * 200 - 1)
         .not(`${list}Top`, 'is', null)
-    if(error){
+    if (error) {
         res.status(400).send(error)
         return
     }
@@ -285,7 +279,7 @@ app.get('/levels/:list/page/:id/:uid', async (req, res) => {
         .order(`${list}Top`, { ascending: true })
         .range((id - 1) * 200, id * 200 - 1)
         .not(`${list}Top`, 'is', null)
-    if(error){
+    if (error) {
         res.status(400).send(error)
         return
     }
@@ -295,23 +289,23 @@ app.get('/levels/:list/page/:id/:uid', async (req, res) => {
         .select('userid, levelid, progress')
         .eq('userid', uid)
     var mp = {}
-    for(const i of data){
+    for (const i of data) {
         mp[i.levelid] = i
     }
-    for(const i of result){
+    for (const i of result) {
         i['progress'] = 0
-        if(mp.hasOwnProperty(i.id)) i['progress'] = mp[i.id].progress
+        if (mp.hasOwnProperty(i.id)) i['progress'] = mp[i.id].progress
     }
     res.status(200).send(result)
 })
-app.get('/player/:id', async (req, res) =>{
+app.get('/player/:id', async (req, res) => {
     const { id } = req.params
     var { data, error } = await supabase
         .from('players')
         .select('*')
         .eq('uid', id)
         .single()
-    if(!data){
+    if (!data) {
         res.status(400).send({
             message: 'Player does not exists'
         })
@@ -325,7 +319,7 @@ app.get('/player/:id/submissions', async (req, res) => {
         .from('submissions')
         .select('*, levels(name)')
         .eq('userid', id)
-        .order("id", {ascending: false})
+        .order("id", { ascending: false })
     res.status(200).send(data)
 })
 app.get('/player/:id/records/:order', async (req, res) => {
@@ -334,7 +328,7 @@ app.get('/player/:id/records/:order', async (req, res) => {
         .from('records')
         .select('*, levels(name)')
         .eq('userid', id)
-        .order(order, {ascending: false})
+        .order(order, { ascending: false })
     res.status(200).send(data)
 })
 app.get('/players/:list/page/:id', async (req, res) => {
@@ -342,10 +336,10 @@ app.get('/players/:list/page/:id', async (req, res) => {
     const { data, error } = await supabase
         .from('players')
         .select('*')
-        .order(`${list}rank`, {ascending: true})
+        .order(`${list}rank`, { ascending: true })
         .range((id - 1) * 200, id * 200 - 1)
         .not(`${list}rank`, 'is', null)
-    if(error){
+    if (error) {
         res.status(400).send(error)
         return
     }
@@ -355,20 +349,20 @@ app.patch('/player/:id', async (req, res) => {
     const { id } = req.params
     var { token, data } = req.body
     a = data
-    if(!checkUser(token, id)){
+    if (!checkUser(token, id)) {
         res.status(403).send({})
         return
     }
     user = jwt.decode(token)
     delete data.isAdmin
-    if(data.name.length > 20){
+    if (data.name.length > 20) {
         res.status(400).send({
-            message:'Too long name (max 20 characters)'
+            message: 'Too long name (max 20 characters)'
         })
         return
     }
-    for(let i = 0; i < data.name.length; i++){
-        if(invalidChar.has(data.name[i])){
+    for (let i = 0; i < data.name.length; i++) {
+        if (invalidChar.has(data.name[i])) {
             res.status(400).send({
                 message: 'Invalid name'
             })
@@ -412,7 +406,7 @@ app.get('/search/:id', async (req, res) => {
             })
         }
         var list = []
-        for(const i in m){
+        for (const i in m) {
             list.push(m[i])
         }
         res.status(200).send([list, players])
@@ -428,8 +422,8 @@ app.get('/search/:id', async (req, res) => {
 app.put('/record', async (req, res) => {
     var { token, data } = req.body
     record = data
-    checkAdmin(token).then( async (user) => {
-        if(!user.isAdmin) {
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -438,44 +432,44 @@ app.put('/record', async (req, res) => {
         var { data, error } = await supabase
             .from('players')
             .select('country')
-            .match({uid: record.userid})
+            .match({ uid: record.userid })
             .single()
-        if(data.country != user.country){
+        if (data.country != user.country) {
             res.status(403).send({
-                'message':'Country does not match'
+                'message': 'Country does not match'
             })
             return
         }
         var { data, error } = await supabase
             .from('submissions')
             .select('userid, levelid')
-            .match({ userid: record.userid, levelid: record.levelid})
+            .match({ userid: record.userid, levelid: record.levelid })
         var { data, error } = await supabase
             .from('submissions')
             .delete()
             .match({ userid: record.userid, levelid: record.levelid })
         delete record.comment
         delete record.players
-        delete record.levels 
-		var { data, error } = await supabase
-			.from('records')
-			.upsert(record)
+        delete record.levels
+        var { data, error } = await supabase
+            .from('records')
+            .upsert(record)
         record = data
         console.log(record)
-		if(error){
-			res.status(500).send(error)
+        if (error) {
+            res.status(500).send(error)
             console.log(error)
-			return
-		}
-		var { data, error} = await supabase.rpc('updateRank')
+            return
+        }
+        var { data, error } = await supabase.rpc('updateRank')
         res.status(200).send(record)
     })
 })
 app.delete('/record/:id', async (req, res) => {
     const { id } = req.params
     const { token } = req.body
-    checkAdmin(token).then( async (user) => {
-        if(!user.isAdmin) {
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -484,38 +478,38 @@ app.delete('/record/:id', async (req, res) => {
         var { data, error } = await supabase
             .from('records')
             .select('players(country)')
-            .match({id: id})
+            .match({ id: id })
             .single()
-        if(data.players.country != user.country){
+        if (data.players.country != user.country) {
             res.status(403).send({
-                'message':'Country does not match'
+                'message': 'Country does not match'
             })
             return
         }
-		var { data, error } = await supabase
-			.from('records')
-			.delete()
-            .match({id : id})
-		if(error){
-			res.status(500).send(error)
-			return
-		}
-		var { data, error} = await supabase.rpc('updateRank')
+        var { data, error } = await supabase
+            .from('records')
+            .delete()
+            .match({ id: id })
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
+        var { data, error } = await supabase.rpc('updateRank')
         res.status(200).send({})
     })
 })
 app.post('/player', async (req, res) => {
     var { token, data } = req.body
     player = data
-    checkAdmin(token).then( async (user) => {
-        if(!user.isAdmin) {
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
             return
         }
         var { data, error } = await supabase.from("players").insert(player)
-        if(error){
+        if (error) {
             res.status(500).send(error)
             return
         }
@@ -527,8 +521,8 @@ app.post('/player', async (req, res) => {
 app.delete('/submission/:id', async (req, res) => {
     var { id } = req.params
     var { token } = req.body
-    checkAdmin(token).then( async (user) => {
-        if(!user.isAdmin) {
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
             res.status(401).send({
                 'message': 'Token Invalid'
             })
@@ -537,12 +531,12 @@ app.delete('/submission/:id', async (req, res) => {
         var { data, error } = await supabase
             .from('submissions')
             .select('players(country)')
-            .match({id: id})
+            .match({ id: id })
             .single()
         console.log(id, data, error)
-        if(data.players.country != user.country){
+        if (data.players.country != user.country) {
             res.status(403).send({
-                'message':'Country does not match'
+                'message': 'Country does not match'
             })
             return
         }
@@ -550,7 +544,7 @@ app.delete('/submission/:id', async (req, res) => {
             .from('submissions')
             .delete()
             .match({ id: id })
-        if(error){
+        if (error) {
             res.status(500).send(error)
             return
         }
