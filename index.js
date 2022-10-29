@@ -263,15 +263,6 @@ app.patch('/level/:id', (req, res) => {
                 level[i] = data[i]
             }
         }
-        const dat = await getLevel(id)
-        if (dat == -1) {
-            res.status(400).send({
-                'message': 'Level does not exist.'
-            })
-            return
-        }
-        level.name = dat.name
-        if (!level.creator) level.creator = dat.author
         if (level.minProgress < 1) level.minProgress = 100
         level.id = parseInt(id)
         if (!level.dlTop && !level.flTop && !level.seaTop) {
