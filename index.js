@@ -14,7 +14,7 @@ const client = new GDClient({
     userName: 'dummy',
     password: 'dummy'
 });
-async function getLevel(id, count = 0){
+async function getLevel(id, count){
     var level = {
         levelID: null,
         name: null,
@@ -42,11 +42,10 @@ async function getLevel(id, count = 0){
         level = await client.api.levels.getById({ levelID: parseInt(id) })
     }
     catch{
-        return await getLevel(id, count + 1)
+        return level
     }
     level.desc = atob(level.desc)
     console.log(level)
-    if(typeof level.name == undefined) return level
     level['difficulty'] = level.diff
     if(level.stars == 10){
         if (level.diff == 'Easy') level.difficulty = 'Easy Demon'
