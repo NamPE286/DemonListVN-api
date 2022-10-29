@@ -239,7 +239,7 @@ app.patch('/level/:id', (req, res) => {
             dlTop: null,
             seaTop: null
         }
-
+        var data = req.body.data
         if (data.dlTop == null) { }
         else if (data.prevdlTop == null) data.seaTop -= 0.5
         else if (data.dlTop < data.prevdlTop) data.dlTop -= 0.5
@@ -459,8 +459,7 @@ app.get('/search/:id', async (req, res) => {
     }
 })
 app.put('/record', async (req, res) => {
-    var { token, data } = req.body
-    record = data
+    var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
@@ -468,6 +467,7 @@ app.put('/record', async (req, res) => {
             })
             return
         }
+        var record = req.body.data
         var { data, error } = await supabase
             .from('players')
             .select('country')
