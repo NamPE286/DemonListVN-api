@@ -14,8 +14,8 @@ const client = new GDClient({
     userName: 'dummy',
     password: 'dummy'
 });
-async function getLevel1(id, count = 0){
-    if (count > 2) return {
+async function getLevel(id, count = 0){
+    var level = {
         levelID: null,
         name: null,
         desc: null,
@@ -38,7 +38,13 @@ async function getLevel1(id, count = 0){
         isLDM: null,
         password: null
     }
-    const level = await client.api.levels.getById({ levelID: parseInt(id) })
+    if (count > 2) return level
+    try{
+        level = await client.api.levels.getById({ levelID: parseInt(id) })
+    }
+    catch{
+        return await getLevel(id, count + 1)
+    }
     level.desc = atob(level.desc)
     console.log(level)
     if(typeof level.name == undefined) return await getLevel(id, count + 1)
@@ -53,36 +59,6 @@ async function getLevel1(id, count = 0){
     level.verifiedCoins = true
     level.length = level.length[0].toUpperCase() + level.length.slice(1).toLowerCase()
     return level
-}
-async function getLevel(id){
-    try{
-        return await getLevel1(id)
-    }
-    catch{
-        return {
-            levelID: null,
-            name: null,
-            desc: null,
-            version: null,
-            creatorUserID: null,
-            diff: null,
-            downloads: null,
-            likes: null,
-            track: null,
-            gameVersion: null,
-            demonDiff: null,
-            stars: null,
-            isFeatured: null,
-            isEpic: null,
-            length: null,
-            original: null,
-            songID: null,
-            coins: null,
-            requestedStars: null,
-            isLDM: null,
-            password: null
-        }
-    }
 }
 
 async function checkAdmin(token) {
