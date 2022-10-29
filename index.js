@@ -222,7 +222,7 @@ app.post('/level/:id', (req, res) => {
 })
 app.patch('/level/:id', (req, res) => {
     const { id } = req.params
-    const { token, data } = req.body
+    const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
