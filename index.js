@@ -14,7 +14,7 @@ const client = new GDClient({
     userName: 'dummy',
     password: 'dummy'
 });
-async function getLevel(id, count){
+async function getLevel(id){
     var level = {
         levelID: null,
         name: null,
@@ -126,7 +126,6 @@ app.get('/level/:id', async (req, res) => {
     res.status(200).send(d)
 })
 app.delete('level/:id', async (req, res) => {
-    const { id } = req.params
     const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
@@ -134,6 +133,7 @@ app.delete('level/:id', async (req, res) => {
                 'message': 'Token Invalid'
             })
         }
+        const { id } = req.params
         await supabase.from("submissions").delete().match({ levelid: item.id });
         await supabase.from('levels').delete().match({ id: id })
     })
@@ -177,8 +177,7 @@ app.get('/level/:id/:country', async (req, res) => {
     res.status(200).send(d)
 })
 app.post('/level/:id', (req, res) => {
-    const { id } = req.params
-    var { token, data } = req.body
+    var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             data = {
@@ -186,6 +185,7 @@ app.post('/level/:id', (req, res) => {
                 creator: data.creator
             }
         }
+        const { id } = req.params
         var level = {
             name: null,
             creator: null,
@@ -195,6 +195,7 @@ app.post('/level/:id', (req, res) => {
             dlTop: null,
             seaTop: null
         }
+        var { data } = req.body
         for (const i in data) {
             if (i in level) {
                 level[i] = data[i]
@@ -221,7 +222,6 @@ app.post('/level/:id', (req, res) => {
     })
 })
 app.patch('/level/:id', (req, res) => {
-    const { id } = req.params
     const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
@@ -239,6 +239,7 @@ app.patch('/level/:id', (req, res) => {
             dlTop: null,
             seaTop: null
         }
+        const { id } = req.params
         var data = req.body.data
         if (data.dlTop == null) { }
         else if (data.prevdlTop == null) data.seaTop -= 0.5
@@ -505,7 +506,6 @@ app.put('/record', async (req, res) => {
     })
 })
 app.delete('/record/:id', async (req, res) => {
-    const { id } = req.params
     const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
@@ -514,6 +514,7 @@ app.delete('/record/:id', async (req, res) => {
             })
             return
         }
+        const { id } = req.params
         var { data, error } = await supabase
             .from('records')
             .select('players(country)')
@@ -538,8 +539,7 @@ app.delete('/record/:id', async (req, res) => {
     })
 })
 app.post('/player', async (req, res) => {
-    var { token, data } = req.body
-    player = data
+    var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
@@ -547,6 +547,7 @@ app.post('/player', async (req, res) => {
             })
             return
         }
+        player = req.body.data
         var { data, error } = await supabase.from("players").insert(player)
         if (error) {
             res.status(500).send(error)
@@ -558,7 +559,6 @@ app.post('/player', async (req, res) => {
     })
 })
 app.delete('/submission/:id', async (req, res) => {
-    var { id } = req.params
     var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
@@ -567,6 +567,7 @@ app.delete('/submission/:id', async (req, res) => {
             })
             return
         }
+        var { id } = req.params
         var { data, error } = await supabase
             .from('submissions')
             .select('players(country)')
