@@ -157,6 +157,15 @@ app.get('/level/:id/:country', async (req, res) => {
         return
     }
     d.data = data[0]
+    const lvapi = await getLevel(id)
+    d.data['difficulty'] = lvapi.difficulty
+    d.data['description'] = lvapi.desc
+    d.data['downloads'] = lvapi.downloads
+    d.data['likes'] = lvapi.likes
+    if (lvapi.disliked) d.data.likes *= -1
+    d.data['length'] = lvapi.length
+    d.data['coins'] = lvapi.coins
+    d.data['verifiedCoins'] = lvapi.verifiedCoins
     d.records = []
     var { data, error } = await supabase
         .from('records')
@@ -196,16 +205,6 @@ app.post('/level/:id', (req, res) => {
         if (level.flTop != null) level.flTop -= 0.5
         if (level.dlTop != null) level.dlTop -= 0.5
         if (level.seaTop != null) level.seaTop -= 0.5
-        const dat = await getLevel(id)
-        if (dat == -1) {
-            res.status(400).send({
-                'message': 'Level does not exist.'
-            })
-            return
-        }
-        level.name = dat.name
-        if (!level.creator) level.creator = dat.author
-        if (level.minProgress < 1) level.minProgress = 100
         level.id = parseInt(id)
         var { data, error } = await supabase
             .from('levels')
