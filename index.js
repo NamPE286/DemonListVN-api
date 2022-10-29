@@ -38,7 +38,7 @@ function checkUser(token, uid) {
 }
 
 app.use(express.json())
-app.use(cors())
+app.use(cors({origin: '*'}))
 
 app.get('/level/:id', async (req, res) => {
     const { id, country } = req.params
