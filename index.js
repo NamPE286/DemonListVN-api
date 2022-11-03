@@ -44,7 +44,7 @@ async function getLevel(id){
     catch{
         return level
     }
-    level.desc = atob(level.desc)
+    level.desc = Buffer.from(level.desc, 'base64').toString()
     console.log(level)
     level['difficulty'] = level.diff
     if(level.stars == 10){
@@ -87,7 +87,7 @@ function checkUser(token, uid) {
 }
 
 app.use(express.json())
-app.use(cors({origin: '*'}))
+app.use(cors())
 
 app.get('/level/:id', async (req, res) => {
     const { id, country } = req.params
