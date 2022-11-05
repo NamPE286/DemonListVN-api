@@ -56,6 +56,7 @@ async function getLevel(id){
     }
     level.verifiedCoins = true
     level.length = level.length[0].toUpperCase() + level.length.slice(1).toLowerCase()
+    if(level.length == 'Xl') level.length = 'XL'
     return level
 }
 
