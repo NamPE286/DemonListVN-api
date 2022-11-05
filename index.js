@@ -86,6 +86,20 @@ function checkUser(token, uid) {
     }
 }
 
+function sendLog(msg){
+    console.log(msg)
+    console.log(process.env.DISCORD_WEBHOOK)
+    fetch(process.env.DISCORD_WEBHOOK, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            content: msg
+        })
+    })
+}
+
 app.use(express.json())
 app.use(cors())
 
@@ -136,6 +150,7 @@ app.delete('level/:id', async (req, res) => {
         const { id } = req.params
         await supabase.from("submissions").delete().match({ levelid: item.id });
         await supabase.from('levels').delete().match({ id: id })
+
     })
 })
 app.get('/level/:id/:country', async (req, res) => {
@@ -293,6 +308,7 @@ app.patch('/level/:id', (req, res) => {
             res.status(500).send(error)
             return
         }
+        sendLog(`${user.name} (${user.uid}) modified ${level.name} (${id})`)
         res.status(200).send(level)
     })
 })
