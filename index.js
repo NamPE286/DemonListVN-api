@@ -531,7 +531,7 @@ app.delete('/record/:id', async (req, res) => {
         const { id } = req.params
         var { data, error } = await supabase
             .from('records')
-            .select('players(country)')
+            .select('*, players!inner(name, uid, country), levels!inner(name, id)')
             .match({ id: id })
             .single()
         if (data.players.country != user.country) {
@@ -540,6 +540,7 @@ app.delete('/record/:id', async (req, res) => {
             })
             return
         }
+        sendLog(`${user.name} (${user.uid}) deleted ${data.players.name}'s (${data.players.uid}) ${data.levels.name} (${data.levels.id}) record`)
         var { data, error } = await supabase
             .from('records')
             .delete()
@@ -584,7 +585,7 @@ app.delete('/submission/:id', async (req, res) => {
         var { id } = req.params
         var { data, error } = await supabase
             .from('submissions')
-            .select('players(country)')
+            .select('*, players!inner(name, uid, country), levels!inner(name, id)')
             .match({ id: id })
             .single()
         console.log(id, data, error)
@@ -594,6 +595,7 @@ app.delete('/submission/:id', async (req, res) => {
             })
             return
         }
+        sendLog(`${user.name} (${user.uid}) rejected ${data.players.name}'s (${data.players.uid}) ${data.levels.name} (${data.levels.id}) submission`)
         var { data, error } = await supabase
             .from('submissions')
             .delete()
