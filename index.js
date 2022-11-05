@@ -86,7 +86,7 @@ function checkUser(token, uid) {
     }
 }
 
-function sendLog(msg){
+async function sendLog(msg){
     console.log(msg)
     console.log(process.env.DISCORD_WEBHOOK)
     fetch(process.env.DISCORD_WEBHOOK, {
@@ -486,21 +486,23 @@ app.put('/record', async (req, res) => {
         }
         var record = req.body.data
         var { data, error } = await supabase
-            .from('players')
-            .select('country')
-            .match({ uid: record.userid })
+            .from('records')
+            .select('players!inner(name, country), levels!inner(name)')
+            .match({ userid: record.userid, levelid: record.levelid })
             .single()
-        if (data.country != user.country) {
+        if(!data) data = record
+        if (data.players.country != user.country) {
             res.status(403).send({
                 'message': 'Country does not match'
             })
             return
         }
+        console.log(record)
+        sendLog(`${user.name} (${user.uid}) modified ${data.players.name}'s (${record.userid}) ${data.levels.name} (${record.levelid}) record`)
         var { data, error } = await supabase
             .from('submissions')
             .delete()
             .match({ userid: record.userid, levelid: record.levelid })
-        sendLog(`${user.name} (${user.uid}) modified ${record.players.name}'s (${record.players.uid}) ${record.levels.name} (${record.levels.id}) record`)
         delete record.comment
         delete record.players
         delete record.levels
