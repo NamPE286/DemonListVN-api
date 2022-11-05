@@ -504,7 +504,6 @@ app.put('/record', async (req, res) => {
             .from('submissions')
             .delete()
             .match({ userid: record.userid, levelid: record.levelid })
-        delete record.comment
         delete record.players
         delete record.levels
         var { data, error } = await supabase
@@ -522,7 +521,7 @@ app.put('/record', async (req, res) => {
     })
     
 })
-app.delete('/record/:id', async (req, res) => {
+app.delete('/record/:userid/:levelid', async (req, res) => {
     const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
@@ -531,11 +530,11 @@ app.delete('/record/:id', async (req, res) => {
             })
             return
         }
-        const { id } = req.params
+        const { userid, levelid } = req.params
         var { data, error } = await supabase
             .from('records')
             .select('*, players!inner(name, uid, country), levels!inner(name, id)')
-            .match({ id: id })
+            .match({ userid: userid, levelid: levelid })
             .single()
         if (data.players.country != user.country) {
             res.status(403).send({
@@ -547,7 +546,7 @@ app.delete('/record/:id', async (req, res) => {
         var { data, error } = await supabase
             .from('records')
             .delete()
-            .match({ id: id })
+            .match({ userid: userid, levelid: levelid })
         if (error) {
             res.status(500).send(error)
             return
@@ -576,43 +575,6 @@ app.post('/player', async (req, res) => {
         })
     })
 })
-app.delete('/submission/:id', async (req, res) => {
-    var { token } = req.body
-    checkAdmin(token).then(async (user) => {
-        if (!user.isAdmin) {
-            res.status(401).send({
-                'message': 'Token Invalid'
-            })
-            return
-        }
-        var { id } = req.params
-        var { data, error } = await supabase
-            .from('submissions')
-            .select('*, players!inner(name, uid, country), levels!inner(name, id)')
-            .match({ id: id })
-            .single()
-        console.log(id, data, error)
-        if (data.players.country != user.country) {
-            res.status(403).send({
-                'message': 'Country does not match'
-            })
-            return
-        }
-        sendLog(`${user.name} (${user.uid}) rejected ${data.players.name}'s (${data.players.uid}) ${data.levels.name} (${data.levels.id}) submission`)
-        var { data, error } = await supabase
-            .from('submissions')
-            .delete()
-            .match({ id: id })
-        if (error) {
-            res.status(500).send(error)
-            return
-        }
-        res.status(200).send({
-            message: 'ok'
-        })
-    })
-})
-
 app.listen(
     PORT,
     () => {
