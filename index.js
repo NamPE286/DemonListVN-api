@@ -482,10 +482,6 @@ app.put('/record', async (req, res) => {
         }
         var { data, error } = await supabase
             .from('submissions')
-            .select('userid, levelid')
-            .match({ userid: record.userid, levelid: record.levelid })
-        var { data, error } = await supabase
-            .from('submissions')
             .delete()
             .match({ userid: record.userid, levelid: record.levelid })
         delete record.comment
