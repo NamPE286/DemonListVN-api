@@ -150,7 +150,7 @@ app.delete('level/:id', async (req, res) => {
         const { id } = req.params
         await supabase.from("submissions").delete().match({ levelid: item.id });
         await supabase.from('levels').delete().match({ id: id })
-
+        sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
 app.get('/level/:id/:country', async (req, res) => {
@@ -500,6 +500,7 @@ app.put('/record', async (req, res) => {
             .from('submissions')
             .delete()
             .match({ userid: record.userid, levelid: record.levelid })
+        sendLog(`${user.name} (${user.uid}) modified ${record.players.name}'s (${record.players.uid}) ${record.levels.name} (${record.levels.id}) record`)
         delete record.comment
         delete record.players
         delete record.levels
@@ -516,6 +517,7 @@ app.put('/record', async (req, res) => {
         var { data, error } = await supabase.rpc('updateRank')
         res.status(200).send(record)
     })
+    
 })
 app.delete('/record/:id', async (req, res) => {
     const { token } = req.body
