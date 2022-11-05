@@ -59,7 +59,10 @@ async function getLevel(id){
     if(level.length == 'Xl') level.length = 'XL'
     return level
 }
-
+async function getCreator(id){
+    const user = await client.api.users.find({ query: level.creatorUserID, page: 0 });
+    return user.users[0]
+}
 async function checkAdmin(token) {
     try {
         jwt.verify(token, process.env.JWT_SECRET)
@@ -574,6 +577,28 @@ app.post('/player', async (req, res) => {
             message: 'ok'
         })
     })
+})
+app.post('/submit/:newLevel', async (req, res) => {
+    var newLevel = parseInt(req.params.newLevel)
+    var { data, error } = await supabase.from("records").insert(req.body.data);
+    if(error) {
+        if(newLevel){
+            const apilv = await getLevel(req.body.data.levelid)
+            const creator = await getCreator(apilv.creatorUserID)
+            const lv = {
+                id: req.body.data.levelid,
+                name: apilv.name,
+                creator: creator
+            }
+            var { data, error } = await supabase
+                .from('levels')
+                .insert(lv)
+            var { data, error } = await supabase.from("records").insert(req.body.data);
+            res.status(200).send({ data: data, error: error })
+        }
+        else res.status(500).send({data: data, error: error})
+    }
+    else res.status(200).send({ data: data, error: error })
 })
 app.listen(
     PORT,
