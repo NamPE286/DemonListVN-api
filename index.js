@@ -388,6 +388,7 @@ app.get('/player/:id/records/:order', async (req, res) => {
         .from('records')
         .select('*, levels(name)')
         .eq('userid', id)
+        .eq('isChecked', true)
         .order(order, { ascending: false })
     res.status(200).send(data)
 })
@@ -580,7 +581,9 @@ app.post('/player', async (req, res) => {
 })
 app.post('/submit/:newLevel', async (req, res) => {
     var newLevel = parseInt(req.params.newLevel)
-    var { data, error } = await supabase.from("records").insert(req.body.data);
+    console.log(req.body)
+    var { data, error } = await supabase.from("records").insert(req.body);
+    console.log(data, error)
     if(error) {
         if(newLevel){
             const apilv = await getLevel(req.body.data.levelid)
@@ -593,7 +596,7 @@ app.post('/submit/:newLevel', async (req, res) => {
             var { data, error } = await supabase
                 .from('levels')
                 .insert(lv)
-            var { data, error } = await supabase.from("records").insert(req.body.data);
+            var { data, error } = await supabase.from("records").insert(req.body);
             res.status(200).send({ data: data, error: error })
         }
         else res.status(500).send({data: data, error: error})
