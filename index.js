@@ -598,6 +598,11 @@ app.post('/submit/:newLevel', async (req, res) => {
                 .insert(lv)
             var { data, error } = await supabase.from("records").insert(req.body);
             res.status(200).send({ data: data, error: error })
+            const { count } = await supabase
+                .from('records')
+                .select('isChecked', { count: 'exact', head: true })
+                .is('isChecked', false)
+            sendLog(`Total submission (all list, include not placed level): ${count}`)
         }
         else res.status(500).send({data: data, error: error})
     }
