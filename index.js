@@ -14,7 +14,7 @@ const client = new GDClient({
     userName: 'dummy',
     password: 'dummy'
 });
-async function getLevel(id){
+async function getLevel(id) {
     var level = {
         levelID: null,
         name: null,
@@ -38,27 +38,27 @@ async function getLevel(id){
         isLDM: null,
         password: null
     }
-    try{
+    try {
         level = await client.api.levels.getById({ levelID: parseInt(id) })
     }
-    catch{
+    catch {
         return level
     }
     level.desc = Buffer.from(level.desc, 'base64').toString()
     level['difficulty'] = level.diff
-    if(level.stars == 10){
+    if (level.stars == 10) {
         if (level.diff == 'Easy') level.difficulty = 'Easy Demon'
         else if (level.diff == 'Normal') level.difficulty = 'Medium Demon'
-        else if(level.diff == 'Hard') level.difficulty = 'Hard Demon'
+        else if (level.diff == 'Hard') level.difficulty = 'Hard Demon'
         else if (level.diff == 'Harder') level.difficulty = 'Insane Demon'
         else level.difficulty = 'Extreme Demon'
     }
     level.verifiedCoins = true
     level.length = level.length[0].toUpperCase() + level.length.slice(1).toLowerCase()
-    if(level.length == 'Xl') level.length = 'XL'
+    if (level.length == 'Xl') level.length = 'XL'
     return level
 }
-async function getCreator(id){
+async function getCreator(id) {
     const user = await client.api.users.find({ query: level.creatorUserID, page: 0 });
     return user.users[0]
 }
@@ -89,7 +89,7 @@ function checkUser(token, uid) {
     }
 }
 
-async function sendLog(msg, url = process.env.DISCORD_WEBHOOK){
+async function sendLog(msg, url = process.env.DISCORD_WEBHOOK) {
     console.log(msg, url)
     fetch(url, {
         method: 'POST',
@@ -230,8 +230,7 @@ app.post('/level/:id', (req, res) => {
             res.status(500).send(error)
             return
         }
-        var { data, error } = await supabase
-            .rpc('updateRank')
+
         if (error) {
             res.status(500).send(error)
             return
@@ -305,8 +304,7 @@ app.patch('/level/:id', (req, res) => {
                 return
             }
         }
-        var { data, error } = await supabase
-            .rpc('updateRank')
+
         if (error) {
             res.status(500).send(error)
             return
@@ -437,7 +435,7 @@ app.patch('/player/:id', async (req, res) => {
         .update(a)
         .match({ uid: user.sub })
     res.status(200).send(data)
-    var { data, error } = await supabase.rpc('updateRank')
+    
 })
 app.get('/search/:id', async (req, res) => {
     var { id } = req.params
@@ -497,7 +495,7 @@ app.put('/record', async (req, res) => {
             .select('players!inner(name, country), levels!inner(name)')
             .match({ userid: record.userid, levelid: record.levelid })
             .single()
-        if(!data) data = record
+        if (!data) data = record
         if (data.players.country != user.country) {
             res.status(403).send({
                 'message': 'Country does not match'
@@ -520,10 +518,10 @@ app.put('/record', async (req, res) => {
             console.log(error)
             return
         }
-        var { data, error } = await supabase.rpc('updateRank')
+        
         res.status(200).send(record)
     })
-    
+
 })
 app.delete('/record/:userid/:levelid', async (req, res) => {
     const { token } = req.body
@@ -555,7 +553,7 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
             res.status(500).send(error)
             return
         }
-        var { data, error } = await supabase.rpc('updateRank')
+        
         res.status(200).send({})
     })
 })
@@ -584,8 +582,8 @@ app.post('/submit/:newLevel', async (req, res) => {
     delete req.body.isChecked
     var { data, error } = await supabase.from("records").insert(req.body);
     console.log(data, error)
-    if(error) {
-        if(newLevel){
+    if (error) {
+        if (newLevel) {
             const apilv = await getLevel(req.body.data.levelid)
             const creator = await getCreator(apilv.creatorUserID)
             const lv = {
@@ -604,7 +602,7 @@ app.post('/submit/:newLevel', async (req, res) => {
                 .is('isChecked', false)
             sendLog(`Total submission (all list, include not placed level): ${count} (New level!)`, process.env.DISCORD_WEBHOOK_ALT)
         }
-        else res.status(500).send({data: data, error: error})
+        else res.status(500).send({ data: data, error: error })
     }
     else {
         res.status(200).send({ data: data, error: error })
