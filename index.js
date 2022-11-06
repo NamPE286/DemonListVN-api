@@ -142,7 +142,7 @@ app.get('/level/:id', async (req, res) => {
     res.status(200).send(d)
 })
 app.delete('level/:id', async (req, res) => {
-    const token = req.headers.authorization
+    const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
@@ -194,7 +194,7 @@ app.get('/level/:id/:country', async (req, res) => {
     res.status(200).send(d)
 })
 app.post('/level/:id', (req, res) => {
-    var token = req.headers.authorization
+    var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             data = {
@@ -239,7 +239,7 @@ app.post('/level/:id', (req, res) => {
     })
 })
 app.patch('/level/:id', (req, res) => {
-    const token = req.headers.authorization
+    const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
@@ -479,7 +479,7 @@ app.get('/search/:id', async (req, res) => {
     }
 })
 app.put('/record', async (req, res) => {
-    var token = req.headers.authorization
+    var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
@@ -522,7 +522,7 @@ app.put('/record', async (req, res) => {
     
 })
 app.delete('/record/:userid/:levelid', async (req, res) => {
-    const token = req.headers.authorization
+    const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
@@ -556,7 +556,7 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
     })
 })
 app.post('/player', async (req, res) => {
-    var token = req.headers.authorization
+    var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
