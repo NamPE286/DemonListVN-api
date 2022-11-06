@@ -136,7 +136,7 @@ app.get('/level/:id', async (req, res) => {
         .select('*, players!inner(name, isHidden)')
         .eq('levelid', id)
         .eq('players.isHidden', false)
-        .eq('isChecked'. true)
+        .eq('isChecked', true)
         .order('progress', { ascending: false })
         .order('timestamp', { ascending: true })
     d.records = data
