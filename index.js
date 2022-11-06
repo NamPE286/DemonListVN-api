@@ -380,7 +380,8 @@ app.get('/player/:id/submissions', async (req, res) => {
         .select('*, levels(name)')
         .eq('userid', id)
         .eq('isChecked', false)
-        .order("id", { ascending: false })
+        .order("timestamp", { ascending: false })
+    console.log(data, error)
     res.status(200).send(data)
 })
 app.get('/player/:id/records/:order', async (req, res) => {
