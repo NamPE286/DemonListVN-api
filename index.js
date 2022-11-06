@@ -136,6 +136,7 @@ app.get('/level/:id', async (req, res) => {
         .select('*, players!inner(name, isHidden)')
         .eq('levelid', id)
         .eq('players.isHidden', false)
+        .eq('isChecked'. true)
         .order('progress', { ascending: false })
         .order('timestamp', { ascending: true })
     d.records = data
@@ -346,6 +347,7 @@ app.get('/levels/:list/page/:id/:uid', async (req, res) => {
         .from('records')
         .select('userid, levelid, progress')
         .eq('userid', uid)
+        .eq('isChecked', true)
     var mp = {}
     for (const i of data) {
         mp[i.levelid] = i
