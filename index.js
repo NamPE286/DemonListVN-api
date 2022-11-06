@@ -376,9 +376,10 @@ app.get('/player/:id', async (req, res) => {
 app.get('/player/:id/submissions', async (req, res) => {
     const { id } = req.params
     var { data, error } = await supabase
-        .from('submissions')
+        .from('records')
         .select('*, levels(name)')
         .eq('userid', id)
+        .eq('isChecked', false)
         .order("id", { ascending: false })
     res.status(200).send(data)
 })
