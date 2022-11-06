@@ -580,6 +580,7 @@ app.post('/player', async (req, res) => {
 })
 app.post('/submit/:newLevel', async (req, res) => {
     var newLevel = parseInt(req.params.newLevel)
+    delete req.body.isChecked
     console.log(req.body)
     var { data, error } = await supabase.from("records").insert(req.body);
     console.log(data, error)
