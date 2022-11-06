@@ -579,6 +579,7 @@ app.post('/submit/:newLevel', async (req, res) => {
     var newLevel = parseInt(req.params.newLevel)
     delete req.body.isChecked
     var { data, error } = await supabase.from("records").insert(req.body);
+    console.log(data, error)
     if(error) {
         if(newLevel){
             const apilv = await getLevel(req.body.data.levelid)
@@ -603,6 +604,10 @@ app.post('/submit/:newLevel', async (req, res) => {
     }
     else {
         res.status(200).send({ data: data, error: error })
+        const { count } = await supabase
+            .from('records')
+            .select('isChecked', { count: 'exact', head: true })
+            .is('isChecked', false)
         sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
     }
 })
