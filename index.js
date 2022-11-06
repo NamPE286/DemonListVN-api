@@ -586,6 +586,7 @@ app.post('/submit/:newLevel', async (req, res) => {
     console.log(data, error)
     if(error) {
         if(newLevel){
+            console.log('ok')
             const apilv = await getLevel(req.body.data.levelid)
             const creator = await getCreator(apilv.creatorUserID)
             const lv = {
@@ -599,6 +600,7 @@ app.post('/submit/:newLevel', async (req, res) => {
             var { data, error } = await supabase.from("records").insert(req.body);
             res.status(200).send({ data: data, error: error })
             const { count } = await supabase
+            console.log('ko')
                 .from('records')
                 .select('isChecked', { count: 'exact', head: true })
                 .is('isChecked', false)
