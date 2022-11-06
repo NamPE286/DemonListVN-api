@@ -90,10 +90,9 @@ function checkUser(token, uid) {
     }
 }
 
-async function sendLog(msg){
-    console.log(msg)
-    console.log(process.env.DISCORD_WEBHOOK)
-    fetch(process.env.DISCORD_WEBHOOK, {
+async function sendLog(msg, url = process.env.DISCORD_WEBHOOK){
+    console.log(msg, url)
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -602,7 +601,7 @@ app.post('/submit/:newLevel', async (req, res) => {
                 .from('records')
                 .select('isChecked', { count: 'exact', head: true })
                 .is('isChecked', false)
-            sendLog(`Total submission (all list, include not placed level): ${count}`)
+            sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
         }
         else res.status(500).send({data: data, error: error})
     }
