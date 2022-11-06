@@ -45,7 +45,6 @@ async function getLevel(id){
         return level
     }
     level.desc = Buffer.from(level.desc, 'base64').toString()
-    console.log(level)
     level['difficulty'] = level.diff
     if(level.stars == 10){
         if (level.diff == 'Easy') level.difficulty = 'Easy Demon'
@@ -501,7 +500,6 @@ app.put('/record', async (req, res) => {
             })
             return
         }
-        console.log(record)
         sendLog(`${user.name} (${user.uid}) modified ${data.players.name}'s (${record.userid}) ${data.levels.name} (${record.levelid}) record`)
         var { data, error } = await supabase
             .from('submissions')
@@ -513,7 +511,6 @@ app.put('/record', async (req, res) => {
             .from('records')
             .upsert(record)
         record = data
-        console.log(record)
         if (error) {
             res.status(500).send(error)
             console.log(error)
@@ -581,12 +578,9 @@ app.post('/player', async (req, res) => {
 app.post('/submit/:newLevel', async (req, res) => {
     var newLevel = parseInt(req.params.newLevel)
     delete req.body.isChecked
-    console.log(req.body)
     var { data, error } = await supabase.from("records").insert(req.body);
-    console.log(data, error)
     if(error) {
         if(newLevel){
-            console.log('ok')
             const apilv = await getLevel(req.body.data.levelid)
             const creator = await getCreator(apilv.creatorUserID)
             const lv = {
@@ -600,15 +594,17 @@ app.post('/submit/:newLevel', async (req, res) => {
             var { data, error } = await supabase.from("records").insert(req.body);
             res.status(200).send({ data: data, error: error })
             const { count } = await supabase
-            console.log('ko')
                 .from('records')
                 .select('isChecked', { count: 'exact', head: true })
                 .is('isChecked', false)
-            sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
+            sendLog(`Total submission (all list, include not placed level): ${count} (New level!)`, process.env.DISCORD_WEBHOOK_ALT)
         }
         else res.status(500).send({data: data, error: error})
     }
-    else res.status(200).send({ data: data, error: error })
+    else {
+        res.status(200).send({ data: data, error: error })
+        sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
+    }
 })
 app.listen(
     PORT,
