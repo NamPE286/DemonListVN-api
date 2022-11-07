@@ -198,10 +198,10 @@ app.post('/level/:id', (req, res) => {
     var { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
-            data = {
-                name: data.name,
-                creator: data.creator
-            }
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
         }
         const { id } = req.params
         var level = {
