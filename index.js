@@ -587,9 +587,9 @@ app.post('/submit/:newLevel', async (req, res) => {
             const apilv = await getLevel(req.body.levelid)
             const creator = await getCreator(apilv.creatorUserID)
             const lv = {
-                id: req.body.data.levelid,
+                id: req.body.levelid,
                 name: apilv.name,
-                creator: creator
+                creator: creator.nick
             }
             var { data, error } = await supabase
                 .from('levels')
