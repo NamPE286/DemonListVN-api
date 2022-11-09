@@ -593,7 +593,7 @@ app.post('/submit/:newLevel', async (req, res) => {
             }
             var { data, error } = await supabase
                 .from('levels')
-                .insert(lv)
+                .upsert(lv)
             var { data, error } = await supabase.from("records").insert(req.body);
             res.status(200).send({ data: data, error: error })
             const { count } = await supabase
