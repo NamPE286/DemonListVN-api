@@ -59,7 +59,7 @@ async function getLevel(id) {
     return level
 }
 async function getCreator(id) {
-    const user = await client.api.users.find({ query: level.creatorUserID, page: 0 });
+    const user = await client.api.users.find({ query: id, page: 0 });
     return user.users[0]
 }
 async function checkAdmin(token) {
