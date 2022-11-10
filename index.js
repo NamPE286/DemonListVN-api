@@ -637,7 +637,7 @@ app.patch('/refreshList', async (req, res) => {
             })
             return
         }
-        var { error } = supabase.rpc('updateRank')
+        var { error } = await supabase.rpc('updateRank')
         res.status(200).send(error)
     })
 })
