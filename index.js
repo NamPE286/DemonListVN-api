@@ -578,8 +578,23 @@ app.post('/player', async (req, res) => {
     })
 })
 app.post('/submit/:newLevel', async (req, res) => {
+    console.log('received')
     var newLevel = parseInt(req.params.newLevel)
-    delete req.body.isChecked
+    req.body['isChecked'] = false
+    var { data, error } = await supabase
+        .from("records")
+        .select('progress, isChecked')
+        .match({userid: req.body.userid, levelid: req.body.levelid})
+        .single()
+    console.log(data, error)
+    if(data){
+        if (data.isChecked && data.progress >= req.body.progress) {
+            res.status(200).send({
+                message: 'Record already exists'
+            })
+            return
+        }
+    }
     var { data, error } = await supabase.from("records").upsert(req.body);
     console.log(data, error)
     if (error) {
@@ -600,7 +615,7 @@ app.post('/submit/:newLevel', async (req, res) => {
                 .from('records')
                 .select('isChecked', { count: 'exact', head: true })
                 .is('isChecked', false)
-            sendLog(`Total submission (all list, include not placed level): ${count} (New level!)`, process.env.DISCORD_WEBHOOK_ALT)
+            //sendLog(`Total submission (all list, include not placed level): ${count} (New level!)`, process.env.DISCORD_WEBHOOK_ALT)
         }
         else res.status(500).send({ data: data, error: error })
     }
@@ -610,7 +625,7 @@ app.post('/submit/:newLevel', async (req, res) => {
             .from('records')
             .select('isChecked', { count: 'exact', head: true })
             .is('isChecked', false)
-        sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
+        //sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
     }
 })
 app.listen(
