@@ -153,6 +153,8 @@ app.delete('level/:id', async (req, res) => {
         const { id } = req.params
         await supabase.from("submissions").delete().match({ levelid: item.id });
         await supabase.from('levels').delete().match({ id: id })
+        res.status(200)
+        await supabase.rpc('updateList')
         sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
@@ -236,6 +238,8 @@ app.post('/level/:id', (req, res) => {
             return
         }
         res.status(200).send(level)
+        await supabase.rpc('updateList')
+        sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     })
 })
 app.patch('/level/:id', (req, res) => {
@@ -311,6 +315,7 @@ app.patch('/level/:id', (req, res) => {
         }
         sendLog(`${user.name} (${user.uid}) modified ${level.name} (${id})`)
         res.status(200).send(level)
+        await supabase.rpc('updateList')
     })
 })
 
@@ -638,6 +643,7 @@ app.patch('/refreshList', async (req, res) => {
             return
         }
         var { error } = await supabase.rpc('updateRank')
+        console.log(error)
         res.status(200).send(error)
     })
 })
