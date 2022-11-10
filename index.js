@@ -628,6 +628,19 @@ app.post('/submit/:newLevel', async (req, res) => {
         //sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
     }
 })
+app.patch('/refreshList', async (req, res) => {
+    const { token } = req.body
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
+            res.status(401).send({
+                'message': 'Token Invalid'
+            })
+            return
+        }
+        var { error } = supabase.rpc('updateRank')
+        res.status(200).send(error)
+    })
+})
 app.listen(
     PORT,
     () => {
