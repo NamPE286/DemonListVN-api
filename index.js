@@ -3,6 +3,7 @@ var cors = require('cors')
 const jwt = require('jsonwebtoken')
 const app = express()
 const fetch = require('cross-fetch')
+const cron = require('node-cron');
 require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
@@ -101,6 +102,12 @@ async function sendLog(msg, url = process.env.DISCORD_WEBHOOK) {
         })
     })
 }
+
+cron.schedule('0 0 * * *', async () => {
+    const { error } = await supabase.rpc('updateRank')
+    console.log(error)
+    console.log("Updated players rank")
+});
 
 app.use(express.json())
 app.use(cors())
