@@ -595,12 +595,12 @@ app.post('/submit/:newLevel', async (req, res) => {
     req.body['isChecked'] = false
     var { data, error } = await supabase
         .from("records")
-        .select('progress, isChecked')
+        .select('progress, isChecked, refreshRate')
         .match({userid: req.body.userid, levelid: req.body.levelid})
         .single()
     console.log(data, error)
     if(data){
-        if (data.isChecked && data.progress >= req.body.progress) {
+        if (data.isChecked && data.progress >= req.body.progress && data.refreshRate <= req.body.refreshRate) {
             res.status(200).send({
                 message: 'Record already exists'
             })
