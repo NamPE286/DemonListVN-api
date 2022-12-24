@@ -601,14 +601,14 @@ app.post('/submit/:newLevel', async (req, res) => {
     console.log(data, error)
     if(data && data.isChecked){
         if (data.progress > req.body.progress) {
-            res.status(200).send({
-                message: 'Record already exists'
+            res.status(400).send({
+                message: 'Record is already exists. Submission cancelled'
             })
             return
         }
         if (data.progress == req.body.progress && data.refreshRate <= req.body.refreshRate){
-            res.status(200).send({
-                message: 'Record already exists'
+            res.status(400).send({
+                message: 'Record is already exists. Submission cancelled'
             })
             return
         }
@@ -628,15 +628,21 @@ app.post('/submit/:newLevel', async (req, res) => {
             var { data, error } = await supabase
                 .from('levels')
                 .insert(lv)
+            if(error){
+                res.status(400).send({
+                    message: 'Level is already exists. Submission cancelled'
+                })
+                return
+            }
             var { data, error } = await supabase.from("records").upsert(req.body);
             res.status(200).send({ data: data, error: error })
             const { count } = await supabase
                 .from('records')
                 .select('isChecked', { count: 'exact', head: true })
                 .is('isChecked', false)
-            //sendLog(`Total submission (all list, include not placed level): ${count} (New level!)`, process.env.DISCORD_WEBHOOK_ALT)
+            sendLog(`Total submission (all list, include not placed level): ${count} (New level!)`, process.env.DISCORD_WEBHOOK_ALT)
         }
-        else res.status(500).send({ data: data, error: error })
+        else res.status(400).send({ data: data, error: error })
     }
     else {
         res.status(200).send({ data: data, error: error })
@@ -644,7 +650,7 @@ app.post('/submit/:newLevel', async (req, res) => {
             .from('records')
             .select('isChecked', { count: 'exact', head: true })
             .is('isChecked', false)
-        //sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
+        sendLog(`Total submission (all list, include not placed level): ${count}`, process.env.DISCORD_WEBHOOK_ALT)
     }
 })
 app.patch('/refreshList', async (req, res) => {
