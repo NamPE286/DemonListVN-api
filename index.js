@@ -599,13 +599,20 @@ app.post('/submit/:newLevel', async (req, res) => {
         .match({userid: req.body.userid, levelid: req.body.levelid})
         .single()
     console.log(data, error)
-    if(data){
-        if (data.isChecked && data.progress >= req.body.progress && data.refreshRate <= req.body.refreshRate) {
+    if(data && data.isChecked){
+        if (data.progress > req.body.progress) {
             res.status(200).send({
                 message: 'Record already exists'
             })
             return
         }
+        if (data.progress == req.body.progress && data.refreshRate <= req.body.refreshRate){
+            res.status(200).send({
+                message: 'Record already exists'
+            })
+            return
+        }
+
     }
     var { data, error } = await supabase.from("records").upsert(req.body);
     console.log(data, error)
