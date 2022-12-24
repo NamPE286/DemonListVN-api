@@ -124,7 +124,7 @@ app.get('/level/:id', async (req, res) => {
         .eq('id', id)
     if (data.length == 0) {
         res.status(400).send({
-            message: 'Level does not exists'
+            error: 'Level does not exists'
         })
         return
     }
@@ -154,7 +154,7 @@ app.delete('level/:id', async (req, res) => {
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
-                'message': 'Token Invalid'
+                'error': 'Token Invalid'
             })
         }
         const { id } = req.params
@@ -177,7 +177,7 @@ app.get('/level/:id/:country', async (req, res) => {
         .eq('id', id)
     if (data.length == 0) {
         res.status(400).send({
-            message: 'Level does not exists'
+            error: 'Level does not exists'
         })
         return
     }
@@ -208,7 +208,7 @@ app.post('/level/:id', (req, res) => {
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
-                'message': 'Token Invalid'
+                'error': 'Token Invalid'
             })
             return
         }
@@ -254,7 +254,7 @@ app.patch('/level/:id', (req, res) => {
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
-                'message': 'Token Invalid'
+                'error': 'Token Invalid'
             })
             return
         }
@@ -377,7 +377,7 @@ app.get('/player/:id', async (req, res) => {
         .single()
     if (!data) {
         res.status(400).send({
-            message: 'Player does not exists'
+            error: 'Player does not exists'
         })
         return
     }
@@ -430,14 +430,14 @@ app.patch('/player/:id', async (req, res) => {
     delete data.isAdmin
     if (data.name.length > 20) {
         res.status(400).send({
-            message: 'Too long name (max 20 characters)'
+            error: 'Name is too long (max 20 characters)'
         })
         return
     }
     for (let i = 0; i < data.name.length; i++) {
         if (invalidChar.has(data.name[i])) {
             res.status(400).send({
-                message: 'Invalid name'
+                error: 'Invalid name'
             })
             return
         }
@@ -497,7 +497,7 @@ app.put('/record', async (req, res) => {
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
-                'message': 'Token Invalid'
+                'error': 'Token Invalid'
             })
             return
         }
@@ -510,7 +510,7 @@ app.put('/record', async (req, res) => {
         if (!data) data = record
         if (data.players.country != user.country) {
             res.status(403).send({
-                'message': 'Country does not match'
+                'error': 'Country does not match'
             })
             return
         }
@@ -540,7 +540,7 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
-                'message': 'Token Invalid'
+                'error': 'Token Invalid'
             })
             return
         }
@@ -552,7 +552,7 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
             .single()
         if (data.players.country != user.country) {
             res.status(403).send({
-                'message': 'Country does not match'
+                'error': 'Country does not match'
             })
             return
         }
@@ -574,7 +574,7 @@ app.post('/player', async (req, res) => {
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
-                'message': 'Token Invalid'
+                'error': 'Token Invalid'
             })
             return
         }
@@ -602,13 +602,13 @@ app.post('/submit/:newLevel', async (req, res) => {
     if(data && data.isChecked){
         if (data.progress > req.body.progress) {
             res.status(400).send({
-                message: 'Record is already exists. Submission cancelled'
+                error: 'Record is already exists. Submission cancelled'
             })
             return
         }
         if (data.progress == req.body.progress && data.refreshRate <= req.body.refreshRate){
             res.status(400).send({
-                message: 'Record is already exists. Submission cancelled'
+                error: 'Record is already exists. Submission cancelled'
             })
             return
         }
@@ -630,7 +630,7 @@ app.post('/submit/:newLevel', async (req, res) => {
                 .insert(lv)
             if(error){
                 res.status(400).send({
-                    message: 'Level is already exists. Submission cancelled'
+                    error: 'Level is already exists. Submission cancelled'
                 })
                 return
             }
@@ -658,7 +658,7 @@ app.patch('/refreshList', async (req, res) => {
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
             res.status(401).send({
-                'message': 'Token Invalid'
+                'error': 'Token Invalid'
             })
             return
         }
