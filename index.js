@@ -447,6 +447,7 @@ app.patch('/player/:id', async (req, res) => {
         .update(a)
         .match({ uid: user.sub })
     res.status(200).send(data)
+    if(a.isHidden) await supabase.rpc('updateRank')
     
 })
 app.get('/search/:id', async (req, res) => {
