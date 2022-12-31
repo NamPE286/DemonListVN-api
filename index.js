@@ -509,6 +509,7 @@ app.put('/record', async (req, res) => {
             .match({ userid: record.userid, levelid: record.levelid })
             .single()
         if (!data) data = record
+        console.log(user)
         if (data.players.country != user.country) {
             res.status(403).send({
                 'error': 'Country does not match'
