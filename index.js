@@ -409,7 +409,7 @@ app.get('/players/rating/page/:id', async (req, res) => {
     const { data, error } = await supabase
         .from('players')
         .select('*')
-        .order(`rating`, { ascending: true })
+        .order(`rating`, { ascending: false })
         .range((id - 1) * 300, id * 300 - 1)
         .not(`rating`, 'is', null)
     if (error) {
