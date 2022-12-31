@@ -412,6 +412,7 @@ app.get('/players/rating/page/:id', async (req, res) => {
         .order(`rating`, { ascending: false })
         .range((id - 1) * 300, id * 300 - 1)
         .not(`rating`, 'is', null)
+        .gte('rating', 0.1)
     if (error) {
         res.status(400).send(error)
         return
