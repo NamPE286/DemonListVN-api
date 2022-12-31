@@ -404,6 +404,20 @@ app.get('/player/:id/records/:order', async (req, res) => {
         .order(order, { ascending: false })
     res.status(200).send(data)
 })
+app.get('/players/rating/page/:id', async (req, res) => {
+    const { id } = req.params
+    const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .order(`rating`, { ascending: true })
+        .range((id - 1) * 300, id * 300 - 1)
+        .not(`rating`, 'is', null)
+    if (error) {
+        res.status(400).send(error)
+        return
+    }
+    res.status(200).send(data)
+})
 app.get('/players/:list/page/:id', async (req, res) => {
     const { id, list } = req.params
     const { data, error } = await supabase
