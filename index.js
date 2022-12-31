@@ -505,10 +505,11 @@ app.put('/record', async (req, res) => {
         var record = req.body.data
         var { data, error } = await supabase
             .from('records')
-            .select('players!inner(name, country), levels!inner(name)')
+            .select('players!inner(country)')
             .match({ userid: record.userid, levelid: record.levelid })
             .single()
         if (!data) data = record
+        else data = data.country
         console.log(user, data)
         if (data.country != user.country) {
             res.status(403).send({
