@@ -332,7 +332,7 @@ app.get('/levels/:list/page/:id', async (req, res) => {
         .from('levels')
         .select('*')
         .order(`${list}Top`, { ascending: true })
-        .range((id - 1) * 200, id * 200 - 1)
+        .range((id - 1) * 300, id * 300 - 1)
         .not(`${list}Top`, 'is', null)
     if (error) {
         res.status(400).send(error)
@@ -346,7 +346,7 @@ app.get('/levels/:list/page/:id/:uid', async (req, res) => {
         .from('levels')
         .select('*')
         .order(`${list}Top`, { ascending: true })
-        .range((id - 1) * 200, id * 200 - 1)
+        .range((id - 1) * 300, id * 300 - 1)
         .not(`${list}Top`, 'is', null)
     if (error) {
         res.status(400).send(error)
@@ -410,7 +410,7 @@ app.get('/players/:list/page/:id', async (req, res) => {
         .from('players')
         .select('*')
         .order(`${list}rank`, { ascending: true })
-        .range((id - 1) * 200, id * 200 - 1)
+        .range((id - 1) * 300, id * 300 - 1)
         .not(`${list}rank`, 'is', null)
     if (error) {
         res.status(400).send(error)
