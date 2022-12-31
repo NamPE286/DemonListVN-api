@@ -510,7 +510,7 @@ app.put('/record', async (req, res) => {
             .single()
         if (!data) data = record
         console.log(user, data)
-        if (data.players.country != user.country) {
+        if (data.country != user.country) {
             res.status(403).send({
                 'error': 'Country does not match'
             })
