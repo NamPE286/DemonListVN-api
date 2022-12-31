@@ -413,6 +413,7 @@ app.get('/players/rating/page/:id', async (req, res) => {
         .range((id - 1) * 300, id * 300 - 1)
         .not(`rating`, 'is', null)
         .gte('rating', 0.1)
+        .match({ isHidden: false })
     if (error) {
         res.status(400).send(error)
         return
@@ -427,6 +428,7 @@ app.get('/players/:list/page/:id', async (req, res) => {
         .order(`${list}rank`, { ascending: true })
         .range((id - 1) * 300, id * 300 - 1)
         .not(`${list}rank`, 'is', null)
+        .match({ isHidden: false })
     if (error) {
         res.status(400).send(error)
         return
