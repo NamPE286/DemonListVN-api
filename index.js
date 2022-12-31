@@ -516,24 +516,28 @@ app.put('/record', async (req, res) => {
             })
             return
         }
-        sendLog(`${user.name} (${user.uid}) modified ${data.players.name}'s (${record.userid}) ${data.levels.name} (${record.levelid}) record`)
         var { data, error } = await supabase
-            .from('submissions')
-            .delete()
-            .match({ userid: record.userid, levelid: record.levelid })
+            .from('levels')
+            .select('name')
+            .match({id: record.levelid})
+        var lvName = data
+        var { data, error } = await supabase
+            .from('players')
+            .select('name')
+            .match({uid: record.userid})
+        var playerName = data
+        sendLog(`${user.name} (${user.uid}) modified ${playerName}'s (${record.userid}) ${lvName} (${record.levelid}) record`)
         delete record.players
         delete record.levels
         var { data, error } = await supabase
             .from('records')
             .upsert(record)
-        record = data
         if (error) {
             res.status(500).send(error)
             console.log(error)
             return
         }
-        
-        res.status(200).send(record)
+        res.status(200).send(data)
     })
 
 })
