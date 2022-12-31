@@ -509,7 +509,7 @@ app.put('/record', async (req, res) => {
             .match({ userid: record.userid, levelid: record.levelid })
             .single()
         if (!data) data = record
-        else data = data.players.country
+        else data = data.players
         console.log(user, data)
         if (data.country != user.country) {
             res.status(403).send({
