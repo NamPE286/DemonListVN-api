@@ -529,6 +529,7 @@ app.put('/record', async (req, res) => {
         sendLog(`${user.name} (${user.uid}) modified ${playerName}'s (${record.userid}) ${lvName} (${record.levelid}) record`)
         delete record.players
         delete record.levels
+        delete record.country
         var { data, error } = await supabase
             .from('records')
             .upsert(record)
