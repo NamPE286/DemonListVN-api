@@ -140,7 +140,7 @@ app.get('/level/:id', async (req, res) => {
     d.data['verifiedCoins'] = lvapi.verifiedCoins
     var { data, error } = await supabase
         .from('records')
-        .select('*, players!inner(name, isHidden)')
+        .select('*, players!inner(name, rating, isHidden)')
         .eq('levelid', id)
         .eq('players.isHidden', false)
         .eq('isChecked', true)
