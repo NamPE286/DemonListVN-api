@@ -520,12 +520,12 @@ app.put('/record', async (req, res) => {
             .from('levels')
             .select('name')
             .match({id: record.levelid})
-        var lvName = data
+        var lvName = data.name
         var { data, error } = await supabase
             .from('players')
             .select('name')
             .match({uid: record.userid})
-        var playerName = data
+        var playerName = data.name
         sendLog(`${user.name} (${user.uid}) modified ${playerName}'s (${record.userid}) ${lvName} (${record.levelid}) record`)
         delete record.players
         delete record.levels
