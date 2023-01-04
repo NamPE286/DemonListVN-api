@@ -269,10 +269,6 @@ app.patch('/level/:id', (req, res) => {
         }
         const { id } = req.params
         var data = req.body.data
-        if (data.dlTop == null) { }
-        else if (data.prevdlTop == null) data.seaTop -= 0.5
-        else if (data.dlTop < data.prevdlTop) data.dlTop -= 0.5
-        else if (data.dlTop > data.prevdlTop) data.dlTop += 0.5
 
         if (data.flTop == null) { }
         else if (data.prevflTop == null) data.seaTop -= 0.5
