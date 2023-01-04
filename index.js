@@ -265,7 +265,8 @@ app.patch('/level/:id', (req, res) => {
             minProgress: null,
             flTop: null,
             dlTop: null,
-            seaTop: null
+            seaTop: null,
+            rating: null
         }
         const { id } = req.params
         var data = req.body.data
