@@ -325,12 +325,31 @@ app.patch('/level/:id', (req, res) => {
 
 app.get('/levels/:list/page/:id', async (req, res) => {
     const { id, list } = req.params
+    const filter = {
+        minTop: 0,
+        maxTop: 1000,
+        minPt: 0,
+        maxPt: 10000,
+    }
+    if('filter' in req.body){
+        for(i in filter){
+            if(i in req.body.filter){
+                filter[i] = req.body.filter[i]
+            }
+        }
+    }
+    var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
     var { data, error } = await supabase
         .from('levels')
         .select('*')
         .order(`${list}Top`, { ascending: true })
         .range((id - 1) * 300, id * 300 - 1)
         .not(`${list}Top`, 'is', null)
+        .gte(`${list}Top`, filter.minTop)
+        .lte(`${list}Top`, filter.maxTop)
+        .gte(listPtName, filter.minPt)
+        .lte(listPtName, filter.maxPt)
+
     if (error) {
         res.status(400).send(error)
         return
@@ -339,12 +358,32 @@ app.get('/levels/:list/page/:id', async (req, res) => {
 })
 app.get('/levels/:list/page/:id/:uid', async (req, res) => {
     const { id, list, uid } = req.params
+    const filter = {
+        minTop: 0,
+        maxTop: 1000,
+        minPt: 0,
+        maxPt: 10000,
+        hideBeatenLevels: false
+    }
+    if('filter' in req.body){
+        for(i in filter){
+            if(i in req.body.filter){
+                filter[i] = req.body.filter[i]
+            }
+        }
+    }
+    var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
     var { data, error } = await supabase
         .from('levels')
         .select('*')
         .order(`${list}Top`, { ascending: true })
         .range((id - 1) * 300, id * 300 - 1)
         .not(`${list}Top`, 'is', null)
+        .gte(`${list}Top`, filter.minTop)
+        .lte(`${list}Top`, filter.maxTop)
+        .gte(listPtName, filter.minPt)
+        .lte(listPtName, filter.maxPt)
+
     if (error) {
         res.status(400).send(error)
         return
@@ -352,7 +391,7 @@ app.get('/levels/:list/page/:id/:uid', async (req, res) => {
     var result = data
     var { data, error } = await supabase
         .from('records')
-        .select('userid, levelid, progress')
+        .select('userid, levelid, progress' )
         .eq('userid', uid)
         .eq('isChecked', true)
     var mp = {}
@@ -362,6 +401,13 @@ app.get('/levels/:list/page/:id/:uid', async (req, res) => {
     for (const i of result) {
         i['progress'] = 0
         if (mp.hasOwnProperty(i.id)) i['progress'] = mp[i.id].progress
+    }
+    if(filter.hideBeatenLevels){
+        const res = []
+        for (const i of result) {
+            if (i.progress != 100) res.push(i)
+        }
+        result = res
     }
     res.status(200).send(result)
 })
