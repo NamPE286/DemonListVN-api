@@ -323,7 +323,7 @@ app.patch('/level/:id', (req, res) => {
     })
 })
 
-app.get('/levels/:list/page/:id', async (req, res) => {
+app.get('/levels/:list/page/:id/:filter?', async (req, res) => {
     const { id, list } = req.params
     const filter = {
         minTop: 0,
@@ -331,10 +331,11 @@ app.get('/levels/:list/page/:id', async (req, res) => {
         minPt: 0,
         maxPt: 10000,
     }
-    if('filter' in req.body){
+    const reqFilter = JSON.parse(req.params.filter)
+    if ('filter' in req.params){
         for(i in filter){
-            if(i in req.body.filter){
-                filter[i] = req.body.filter[i]
+            if(i in reqFilter){
+                filter[i] = reqFilter[i]
             }
         }
     }
@@ -356,7 +357,7 @@ app.get('/levels/:list/page/:id', async (req, res) => {
     }
     res.status(200).send(data)
 })
-app.get('/levels/:list/page/:id/:uid', async (req, res) => {
+app.get('/levels/:list/page/:id/:uid/:filter?', async (req, res) => {
     const { id, list, uid } = req.params
     const filter = {
         minTop: 0,
@@ -365,10 +366,11 @@ app.get('/levels/:list/page/:id/:uid', async (req, res) => {
         maxPt: 10000,
         hideBeatenLevels: false
     }
-    if('filter' in req.body){
-        for(i in filter){
-            if(i in req.body.filter){
-                filter[i] = req.body.filter[i]
+    const reqFilter = JSON.parse(req.params.filter)
+    if ('filter' in req.params) {
+        for (i in filter) {
+            if (i in reqFilter) {
+                filter[i] = reqFilter[i]
             }
         }
     }
