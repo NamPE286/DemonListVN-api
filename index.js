@@ -113,7 +113,7 @@ app.use(express.json())
 app.use(cors())
 
 app.head('/', (req, res) => {
-    res.status(200)
+    res.status(200).send({})
 })
 
 app.get('/level/:id', async (req, res) => {
