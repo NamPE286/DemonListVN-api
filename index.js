@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const app = express()
 const fetch = require('cross-fetch')
 const cron = require('node-cron');
+const redisClient = require('redis').createClient()
 require('dotenv').config()
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
@@ -15,6 +16,12 @@ const client = new GDClient({
     userName: 'dummy',
     password: 'dummy'
 });
+
+async function redisConnect(){
+    await redisClient.connect()
+}
+redisConnect()
+
 async function getLevel(id) {
     var level = {
         levelID: null,
@@ -166,6 +173,7 @@ app.delete('level/:id', async (req, res) => {
         await supabase.from('levels').delete().match({ id: id })
         res.status(200)
         await supabase.rpc('updateList')
+        redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
@@ -243,13 +251,13 @@ app.post('/level/:id', (req, res) => {
             res.status(500).send(error)
             return
         }
-
         if (error) {
             res.status(500).send(error)
             return
         }
         res.status(200).send(level)
         await supabase.rpc('updateList')
+        redisClient.flushAll('ASYNC', () => {})
         sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     })
 })
@@ -324,10 +332,11 @@ app.patch('/level/:id', (req, res) => {
         sendLog(`${user.name} (${user.uid}) modified ${level.name} (${id})`)
         res.status(200).send(level)
         await supabase.rpc('updateList')
+        redisClient.flushAll('ASYNC', () => { })
     })
 })
 
-app.get('/levels/:list/page/:id/:filter?', async (req, res) => {
+async function getLevelsList(req, res){
     const { id, list } = req.params
     const filter = {
         minTop: 0,
@@ -336,79 +345,97 @@ app.get('/levels/:list/page/:id/:filter?', async (req, res) => {
         maxPt: 10000,
     }
     var reqFilter
-    console.log(req.params)
-    try{
-        reqFilter = JSON.parse(req.params.filter)
-    }
-    catch{
-        reqFilter = {}
-    }
-    if ('filter' in req.params){
-        for(i in filter){
-            console.log(i)
-            if(i in reqFilter){
-                filter[i] = reqFilter[i]
-            }
-        }
-    }
-    var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
-    var { data, error } = await supabase
-        .from('levels')
-        .select('*')
-        .order(`${list}Top`, { ascending: true })
-        .range((id - 1) * 300, id * 300 - 1)
-        .not(`${list}Top`, 'is', null)
-        .gte(`${list}Top`, filter.minTop)
-        .lte(`${list}Top`, filter.maxTop)
-        .gte(listPtName, filter.minPt)
-        .lte(listPtName, filter.maxPt)
-
-    if (error) {
-        res.status(400).send(error)
-        return
-    }
-    res.status(200).send(data)
-})
-app.get('/levels/:list/page/:id/:uid/:filter?', async (req, res) => {
-    const { id, list, uid } = req.params
-    const filter = {
-        minTop: 0,
-        maxTop: 1000,
-        minPt: 0,
-        maxPt: 10000,
-        hideBeatenLevels: false
-    }
-    var reqFilter
     try {
         reqFilter = JSON.parse(req.params.filter)
+        delete reqFilter.hideBeatenLevels
+        if(Object.keys(reqFilter).length == 0) reqFilter = null
     }
     catch {
-        reqFilter = {}
+        reqFilter = null
     }
-    if ('filter' in req.params) {
-        for (i in filter) {
-            if (i in reqFilter) {
-                filter[i] = reqFilter[i]
+    console.log(reqFilter, filter)
+    if (!reqFilter) {
+        console.log('ok')
+        var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
+        var cachedData = await redisClient.get(`${list}Levels${id}`)
+        if (cachedData) {
+            console.log('cache hit')
+            return {
+                error: null,
+                data: cachedData
+            }
+        }
+        else {
+            console.log('cache miss')
+            var { data, error } = await supabase
+                .from('levels')
+                .select('*')
+                .order(`${list}Top`, { ascending: true })
+                .range((id - 1) * 300, id * 300 - 1)
+                .not(`${list}Top`, 'is', null)
+
+            if (error) {
+                return {
+                    error: error,
+                    data: null
+                }
+            }
+            redisClient.set(`${list}Levels${id}`, JSON.stringify(data))
+            return {
+                error: null,
+                data: data
             }
         }
     }
-    var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
-    var { data, error } = await supabase
-        .from('levels')
-        .select('*')
-        .order(`${list}Top`, { ascending: true })
-        .range((id - 1) * 300, id * 300 - 1)
-        .not(`${list}Top`, 'is', null)
-        .gte(`${list}Top`, filter.minTop)
-        .lte(`${list}Top`, filter.maxTop)
-        .gte(listPtName, filter.minPt)
-        .lte(listPtName, filter.maxPt)
+    else {
+        console.log('meh')
+        if ('filter' in req.params) {
+            for (i in filter) {
+                if (i in reqFilter) {
+                    filter[i] = reqFilter[i]
+                }
+            }
+        }
+        var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
+        var { data, error } = await supabase
+            .from('levels')
+            .select('*')
+            .order(`${list}Top`, { ascending: true })
+            .range((id - 1) * 300, id * 300 - 1)
+            .not(`${list}Top`, 'is', null)
+            .gte(`${list}Top`, filter.minTop)
+            .lte(`${list}Top`, filter.maxTop)
+            .gte(listPtName, filter.minPt)
+            .lte(listPtName, filter.maxPt)
 
-    if (error) {
-        res.status(400).send(error)
+        if (error) {
+            return {
+                error: error,
+                data: null
+            }
+        }
+        return {
+            error: null,
+            data: data
+        }
+    }
+
+}
+
+app.get('/levels/:list/page/:id/:uid?/:filter?', async (req, res) => {
+    console.log('oge')
+    const { uid } = req.params
+    console.log(req.params)
+    const lvList = await getLevelsList(req, res)
+    if (lvList.error) {
+        res.status(404).send(lvList.error)
         return
     }
-    var result = data
+    if (!uid || uid == "0") {
+        res.status(200).send(lvList.data)
+        return
+    }
+    var result = lvList.data
     var { data, error } = await supabase
         .from('records')
         .select('userid, levelid, progress' )
@@ -422,7 +449,7 @@ app.get('/levels/:list/page/:id/:uid/:filter?', async (req, res) => {
         i['progress'] = 0
         if (mp.hasOwnProperty(i.id)) i['progress'] = mp[i.id].progress
     }
-    if(filter.hideBeatenLevels){
+    if (req.params.filter && req.params.filter['hideBeatenLevels']){
         const res = []
         for (const i of result) {
             if (i.progress != 100) res.push(i)
@@ -754,6 +781,7 @@ app.patch('/refreshList', async (req, res) => {
         }
         var { error } = await supabase.rpc('updateRank')
         var { error } = await supabase.rpc('updateList')
+        redisClient.flushAll('ASYNC', () => { })
         console.log(error)
         res.status(200).send(error)
     })
