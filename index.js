@@ -112,6 +112,10 @@ cron.schedule('0 0 * * *', async () => {
 app.use(express.json())
 app.use(cors())
 
+app.head('/', (req, res) => {
+    res.status(200)
+})
+
 app.get('/level/:id', async (req, res) => {
     const { id, country } = req.params
     const d = {
