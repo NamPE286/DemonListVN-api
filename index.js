@@ -357,7 +357,7 @@ async function getLevelsList(req, res){
         reqFilter = null
     }
     console.log(reqFilter, filter)
-    if (!reqFilter) {
+    if (!reqFilter || reqFilter == filter) {
         console.log('ok')
         var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
         var cachedData = await redisClient.get(`${list}Levels${id}`)
