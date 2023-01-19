@@ -562,25 +562,28 @@ app.patch('/player/:id', async (req, res) => {
 })
 app.get('/search/:id', async (req, res) => {
     var { id } = req.params
+    console.log(id)
     if (isNaN(id)) {
+        console.log('ok')
+        const cachedData = await redisClient.get(`search?${id}`)
+        if(cachedData){
+            console.log('cache hit')
+            res.status(200).send(cachedData)
+            return
+        }
+        console.log('cache miss')
         var m = {}
         var { data, error } = await supabase
             .from('levels')
             .select('*')
-            .textSearch('name', `'${id}'`, {
-                type: 'websearch',
-                config: 'english'
-            })
+            .ilike('name', `%${id}%`)
         for (var i = 0; i < data.length; i++) {
             m[data[i].id] = data[i]
         }
         var { data, error } = await supabase
             .from('players')
             .select('name, uid, isHidden')
-            .textSearch('name', `'${id}'`, {
-                type: 'websearch',
-                config: 'english'
-            })
+            .ilike('name', `%${id}%`)
             .eq('isHidden', false)
         var players = []
         for (var i = 0; i < data.length; i++) {
@@ -594,6 +597,7 @@ app.get('/search/:id', async (req, res) => {
             list.push(m[i])
         }
         res.status(200).send([list, players])
+        redisClient.set(`search?${id}`, JSON.stringify([list, players]))
     }
     else {
         var { data, error } = await supabase
