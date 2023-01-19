@@ -335,9 +335,17 @@ app.get('/levels/:list/page/:id/:filter?', async (req, res) => {
         minPt: 0,
         maxPt: 10000,
     }
-    const reqFilter = JSON.parse(req.params.filter)
+    var reqFilter
+    console.log(req.params)
+    try{
+        reqFilter = JSON.parse(req.params.filter)
+    }
+    catch{
+        reqFilter = {}
+    }
     if ('filter' in req.params){
         for(i in filter){
+            console.log(i)
             if(i in reqFilter){
                 filter[i] = reqFilter[i]
             }
@@ -370,7 +378,13 @@ app.get('/levels/:list/page/:id/:uid/:filter?', async (req, res) => {
         maxPt: 10000,
         hideBeatenLevels: false
     }
-    const reqFilter = JSON.parse(req.params.filter)
+    var reqFilter
+    try {
+        reqFilter = JSON.parse(req.params.filter)
+    }
+    catch {
+        reqFilter = {}
+    }
     if ('filter' in req.params) {
         for (i in filter) {
             if (i in reqFilter) {
