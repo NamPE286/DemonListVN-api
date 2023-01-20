@@ -9,7 +9,7 @@ const redisClient = require('redis').createClient({socket:{
     port:'6565'
 }})
 require('dotenv').config()
-const PORT = 5050
+const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
 
