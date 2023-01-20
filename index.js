@@ -126,7 +126,10 @@ app.head('/', (req, res) => {
     console.log('server ok')
     res.status(200).send({})
 })
-
+app.get('/', (req, res) => {
+    console.log('server ok')
+    res.status(200).send({message: 'server ok'})
+})
 app.get('/level/:id', async (req, res) => {
     const { id, country } = req.params
     const d = {
