@@ -123,6 +123,7 @@ app.use(express.json())
 app.use(cors())
 
 app.head('/', (req, res) => {
+    console.log('server ok')
     res.status(200).send({})
 })
 
