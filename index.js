@@ -122,10 +122,6 @@ cron.schedule('0 0 * * *', async () => {
 app.use(express.json())
 app.use(cors())
 
-app.head('/', (req, res) => {
-    console.log('server ok')
-    res.status(200).send({})
-})
 app.get('/', (req, res) => {
     console.log('server ok')
     res.status(200).send({message: 'server ok'})
