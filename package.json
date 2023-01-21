@@ -16,8 +16,8 @@
     "redis": "^4.5.1",
     "typescript": "^4.7.4"
   },
-  "name": "demonlistseaapi",
-  "description": "Southeast Asian's Demon List REST API",
+  "name": "demonlistvnapi",
+  "description": "Demon List VN REST API",
   "version": "1.0.0",
   "main": "index.js",
   "engines": {
@@ -29,13 +29,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NamPE286/SEADemonList-api.git"
+    "url": "git+https://github.com/NamPE286/DemonListVN-api.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/NamPE286/SEADemonList-api/issues"
+    "url": "https://github.com/NamPE286/DemonListVN-api/issues"
   },
-  "homepage": "https://github.com/NamPE286/SEADemonList-api#readme"
+  "homepage": "https://github.com/NamPE286/DemonListVN-api#readme"
 }
