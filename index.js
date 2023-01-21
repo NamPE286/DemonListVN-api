@@ -4,11 +4,11 @@ const jwt = require('jsonwebtoken')
 const app = express()
 const fetch = require('cross-fetch')
 const cron = require('node-cron');
-const redisClient = require('redis').createClient({socket:{
-    host:'127.0.0.1',
-    port:'6565'
-}})
 require('dotenv').config()
+const redisClient = require('redis').createClient({socket:{
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+}})
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
