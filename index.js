@@ -5,10 +5,13 @@ const app = express()
 const fetch = require('cross-fetch')
 const cron = require('node-cron');
 require('dotenv').config()
-const redisClient = require('redis').createClient({socket:{
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-}})
+const redisClient = require('redis').createClient({
+    socket: {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+
+    }, password: process.env.REDIS_PASSWORD
+})
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
@@ -20,7 +23,7 @@ const client = new GDClient({
     password: 'dummy'
 });
 
-async function redisConnect(){
+async function redisConnect() {
     await redisClient.connect()
 }
 redisConnect()
@@ -124,7 +127,7 @@ app.use(cors())
 
 app.get('/', (req, res) => {
     console.log('server ok')
-    res.status(200).send({message: 'server ok'})
+    res.status(200).send({ message: 'server ok' })
 })
 app.get('/level/:id', async (req, res) => {
     const { id, country } = req.params
@@ -258,7 +261,7 @@ app.post('/level/:id', (req, res) => {
         }
         res.status(200).send(level)
         await supabase.rpc('updateList')
-        redisClient.flushAll('ASYNC', () => {})
+        redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     })
 })
@@ -330,7 +333,7 @@ app.patch('/level/:id', (req, res) => {
     })
 })
 
-async function getLevelsList(req, res){
+async function getLevelsList(req, res) {
     const { id, list } = req.params
     const filter = {
         minTop: 0,
@@ -342,7 +345,7 @@ async function getLevelsList(req, res){
     try {
         reqFilter = JSON.parse(req.params.filter)
         delete reqFilter.hideBeatenLevels
-        if(Object.keys(reqFilter).length == 0) reqFilter = null
+        if (Object.keys(reqFilter).length == 0) reqFilter = null
     }
     catch {
         reqFilter = null
@@ -432,7 +435,7 @@ app.get('/levels/:list/page/:id/:uid?/:filter?', async (req, res) => {
     var result = lvList.data
     var { data, error } = await supabase
         .from('records')
-        .select('userid, levelid, progress' )
+        .select('userid, levelid, progress')
         .eq('userid', uid)
         .eq('isChecked', true)
     var mp = {}
@@ -443,7 +446,7 @@ app.get('/levels/:list/page/:id/:uid?/:filter?', async (req, res) => {
         i['progress'] = 0
         if (mp.hasOwnProperty(i.id)) i['progress'] = mp[i.id].progress
     }
-    if (req.params.filter && req.params.filter['hideBeatenLevels']){
+    if (req.params.filter && req.params.filter['hideBeatenLevels']) {
         const res = []
         for (const i of result) {
             if (i.progress != 100) res.push(i)
@@ -548,8 +551,8 @@ app.patch('/player/:id', async (req, res) => {
         .update(a)
         .match({ uid: user.sub })
     res.status(200).send(data)
-    if(a.isHidden) await supabase.rpc('updateRank')
-    
+    if (a.isHidden) await supabase.rpc('updateRank')
+
 })
 app.get('/search/:id', async (req, res) => {
     var { id } = req.params
@@ -557,7 +560,7 @@ app.get('/search/:id', async (req, res) => {
     if (isNaN(id)) {
         console.log('ok')
         const cachedData = await redisClient.get(`search?${id}`)
-        if(cachedData){
+        if (cachedData) {
             console.log('cache hit')
             res.status(200).send(cachedData)
             return
@@ -625,13 +628,13 @@ app.put('/record', async (req, res) => {
         var { data, error } = await supabase
             .from('levels')
             .select('name')
-            .match({id: record.levelid})
+            .match({ id: record.levelid })
             .single()
         var lvName = data.name
         var { data, error } = await supabase
             .from('players')
             .select('name')
-            .match({uid: record.userid})
+            .match({ uid: record.userid })
             .single()
         var playerName = data.name
         sendLog(`${user.name} (${user.uid}) modified ${playerName}'s (${record.userid}) ${lvName} (${record.levelid}) record`)
@@ -680,7 +683,7 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
             res.status(500).send(error)
             return
         }
-        
+
         res.status(200).send({})
     })
 })
@@ -711,17 +714,17 @@ app.post('/submit/:newLevel', async (req, res) => {
     var { data, error } = await supabase
         .from("records")
         .select('progress, isChecked, refreshRate')
-        .match({userid: req.body.userid, levelid: req.body.levelid})
+        .match({ userid: req.body.userid, levelid: req.body.levelid })
         .single()
     console.log(data, error)
-    if(data && data.isChecked){
+    if (data && data.isChecked) {
         if (data.progress > req.body.progress) {
             res.status(400).send({
                 error: 'Record is already exists. Submission cancelled'
             })
             return
         }
-        if (data.progress == req.body.progress && data.refreshRate <= req.body.refreshRate){
+        if (data.progress == req.body.progress && data.refreshRate <= req.body.refreshRate) {
             res.status(400).send({
                 error: 'Record is already exists. Submission cancelled'
             })
@@ -743,7 +746,7 @@ app.post('/submit/:newLevel', async (req, res) => {
             var { data, error } = await supabase
                 .from('levels')
                 .insert(lv)
-            if(error){
+            if (error) {
                 res.status(400).send({
                     error: 'Level is already exists. Submission cancelled'
                 })
