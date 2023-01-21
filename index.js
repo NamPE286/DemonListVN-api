@@ -235,7 +235,6 @@ app.post('/level/:id', (req, res) => {
             minProgress: null,
             flTop: null,
             dlTop: null,
-            seaTop: null
         }
         var { data } = req.body
         for (const i in data) {
@@ -245,7 +244,6 @@ app.post('/level/:id', (req, res) => {
         }
         if (level.flTop != null) level.flTop -= 0.5
         if (level.dlTop != null) level.dlTop -= 0.5
-        if (level.seaTop != null) level.seaTop -= 0.5
         level.id = parseInt(id)
         var { data, error } = await supabase
             .from('levels')
@@ -280,21 +278,14 @@ app.patch('/level/:id', (req, res) => {
             minProgress: null,
             flTop: null,
             dlTop: null,
-            seaTop: null,
             rating: null
         }
         const { id } = req.params
         var data = req.body.data
 
         if (data.flTop == null) { }
-        else if (data.prevflTop == null) data.seaTop -= 0.5
         else if (data.flTop < data.prevflTop) data.flTop -= 0.5
         else if (data.flTop > data.prevflTop) data.flTop += 0.5
-
-        if (data.seaTop == null) { }
-        else if (data.prevseaTop == null) data.seaTop -= 0.5
-        else if (data.seaTop < data.prevseaTop) data.seaTop -= 0.5
-        else if (data.seaTop > data.prevseaTop) data.dlTop += 0.5
 
         for (const i in data) {
             if (i in level) {
@@ -303,7 +294,7 @@ app.patch('/level/:id', (req, res) => {
         }
         if (level.minProgress < 1) level.minProgress = 100
         level.id = parseInt(id)
-        if (!level.dlTop && !level.flTop && !level.seaTop) {
+        if (!level.dlTop && !level.flTop) {
             var { data, error } = await supabase
                 .from('submissions')
                 .delete()
