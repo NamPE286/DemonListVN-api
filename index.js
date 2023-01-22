@@ -5,13 +5,23 @@ const app = express()
 const fetch = require('cross-fetch')
 const cron = require('node-cron');
 require('dotenv').config()
-const redisClient = require('redis').createClient({
-    socket: {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
+const redisEnabled = JSON.parse(process.env.ENABLE_REDIS)
+console.log(redisEnabled)
+var redisClient;
+if(redisEnabled){
+    redisClient = require('redis').createClient({
+        socket: {
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_PORT,
 
-    }, password: process.env.REDIS_PASSWORD
-})
+        }, password: process.env.REDIS_PASSWORD
+    })
+    async function redisConnect() {
+        await redisClient.connect()
+    }
+    redisConnect()
+}
+
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
@@ -23,10 +33,7 @@ const client = new GDClient({
     password: 'dummy'
 });
 
-async function redisConnect() {
-    await redisClient.connect()
-}
-redisConnect()
+
 
 async function getLevel(id) {
     var level = {
@@ -179,7 +186,7 @@ app.delete('level/:id', async (req, res) => {
         await supabase.from('levels').delete().match({ id: id })
         res.status(200)
         await supabase.rpc('updateList')
-        redisClient.flushAll('ASYNC', () => { })
+        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
@@ -261,7 +268,7 @@ app.post('/level/:id', (req, res) => {
         }
         res.status(200).send(level)
         await supabase.rpc('updateList')
-        redisClient.flushAll('ASYNC', () => { })
+        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     })
 })
@@ -329,7 +336,7 @@ app.patch('/level/:id', (req, res) => {
         sendLog(`${user.name} (${user.uid}) modified ${level.name} (${id})`)
         res.status(200).send(level)
         await supabase.rpc('updateList')
-        redisClient.flushAll('ASYNC', () => { })
+        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
     })
 })
 
@@ -354,7 +361,10 @@ async function getLevelsList(req, res) {
     if (!reqFilter || reqFilter == filter) {
         console.log('ok')
         var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
-        var cachedData = await redisClient.get(`${list}Levels${id}`)
+        var cachedData;
+        if(redisEnabled){
+            cachedData = await redisClient.get(`${list}Levels${id}`)
+        }
         if (cachedData) {
             console.log('cache hit')
             return {
@@ -377,7 +387,7 @@ async function getLevelsList(req, res) {
                     data: null
                 }
             }
-            redisClient.set(`${list}Levels${id}`, JSON.stringify(data))
+            if(redisEnabled) redisClient.set(`${list}Levels${id}`, JSON.stringify(data))
             return {
                 error: null,
                 data: data
@@ -559,7 +569,8 @@ app.get('/search/:id', async (req, res) => {
     console.log(id)
     if (isNaN(id)) {
         console.log('ok')
-        const cachedData = await redisClient.get(`search?${id}`)
+        var cachedData
+        if(redisEnabled) cachedData = await redisClient.get(`search?${id}`)
         if (cachedData) {
             console.log('cache hit')
             res.status(200).send(cachedData)
@@ -591,7 +602,7 @@ app.get('/search/:id', async (req, res) => {
             list.push(m[i])
         }
         res.status(200).send([list, players])
-        redisClient.set(`search?${id}`, JSON.stringify([list, players]))
+        if(redisEnabled) redisClient.set(`search?${id}`, JSON.stringify([list, players]))
     }
     else {
         var { data, error } = await supabase
@@ -782,7 +793,7 @@ app.patch('/refreshList', async (req, res) => {
         }
         var { error } = await supabase.rpc('updateRank')
         var { error } = await supabase.rpc('updateList')
-        redisClient.flushAll('ASYNC', () => { })
+        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
         console.log(error)
         res.status(200).send(error)
     })
