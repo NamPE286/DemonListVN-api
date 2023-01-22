@@ -137,7 +137,7 @@ app.get('/', (req, res) => {
     res.status(200).send({ message: 'server ok' })
 })
 app.get('/level/:id', async (req, res) => {
-    const { id, country } = req.params
+    const { id } = req.params
     const d = {
         data: {},
         records: []
@@ -190,44 +190,7 @@ app.delete('level/:id', async (req, res) => {
         sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
-app.get('/level/:id/:country', async (req, res) => {
-    const { id, country } = req.params
-    const d = {
-        data: {},
-        records: []
-    }
-    var { data, error } = await supabase
-        .from('levels')
-        .select('*')
-        .eq('id', id)
-    if (data.length == 0) {
-        res.status(400).send({
-            error: 'Level does not exists'
-        })
-        return
-    }
-    d.data = data[0]
-    const lvapi = await getLevel(id)
-    d.data['difficulty'] = lvapi.difficulty
-    d.data['description'] = lvapi.desc
-    d.data['downloads'] = lvapi.downloads
-    d.data['likes'] = lvapi.likes
-    if (lvapi.disliked) d.data.likes *= -1
-    d.data['length'] = lvapi.length
-    d.data['coins'] = lvapi.coins
-    d.data['verifiedCoins'] = lvapi.verifiedCoins
-    d.records = []
-    var { data, error } = await supabase
-        .from('records')
-        .select('*, players(name, country)')
-        .eq('levelid', id)
-        .order('progress', { ascending: false })
-        .order('timestamp', { ascending: true })
-    for (const i of data) {
-        if (i.players.country == country) d.records.push(i)
-    }
-    res.status(200).send(d)
-})
+
 app.post('/level/:id', (req, res) => {
     var { token } = req.body
     checkAdmin(token).then(async (user) => {
@@ -623,20 +586,6 @@ app.put('/record', async (req, res) => {
         }
         var record = req.body.data
         var { data, error } = await supabase
-            .from('records')
-            .select('players!inner(country)')
-            .match({ userid: record.userid, levelid: record.levelid })
-            .single()
-        if (!data) data = record
-        else data = data.players
-        console.log(user, data)
-        if (data.country != user.country) {
-            res.status(403).send({
-                'error': 'Country does not match'
-            })
-            return
-        }
-        var { data, error } = await supabase
             .from('levels')
             .select('name')
             .match({ id: record.levelid })
@@ -651,7 +600,6 @@ app.put('/record', async (req, res) => {
         sendLog(`${user.name} (${user.uid}) modified ${playerName}'s (${record.userid}) ${lvName} (${record.levelid}) record`)
         delete record.players
         delete record.levels
-        delete record.country
         var { data, error } = await supabase
             .from('records')
             .upsert(record)
@@ -676,15 +624,9 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
         const { userid, levelid } = req.params
         var { data, error } = await supabase
             .from('records')
-            .select('*, players!inner(name, uid, country), levels!inner(name, id)')
+            .select('*, players!inner(name, uid), levels!inner(name, id)')
             .match({ userid: userid, levelid: levelid })
             .single()
-        if (data.players.country != user.country) {
-            res.status(403).send({
-                'error': 'Country does not match'
-            })
-            return
-        }
         sendLog(`${user.name} (${user.uid}) deleted ${data.players.name}'s (${data.players.uid}) ${data.levels.name} (${data.levels.id}) record`)
         var { data, error } = await supabase
             .from('records')
