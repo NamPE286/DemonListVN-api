@@ -787,6 +787,29 @@ app.patch('/refreshList', async (req, res) => {
         res.status(200).send(error)
     })
 })
+app.patch('/mergeAccount/:a/:b', async (req, res) => {
+    const { token } = req.body
+    const { a, b } = req.params
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
+            res.status(401).send({
+                'error': 'Token Invalid'
+            })
+            return
+        }
+        var { data, error } = await supabase
+            .from('records')
+            .update({ userid: b })
+            .eq('userid', a)
+        var { error } = await supabase
+            .from('players')
+            .delete()
+            .match({uid: a})
+        await supabase.rpc('updateRank')
+        console.log(error)
+        res.status(200).send(error)
+    })
+})
 app.listen(
     PORT,
     () => {
