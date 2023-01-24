@@ -521,7 +521,7 @@ app.patch('/player/:id', async (req, res) => {
     }
     var { data, error } = await supabase
         .from('players')
-        .update(a)
+        .upsert(a)
         .match({ uid: user.sub })
     res.status(200).send(data)
     if (a.isHidden) await supabase.rpc('updateRank')
