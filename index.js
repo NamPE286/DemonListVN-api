@@ -498,17 +498,19 @@ app.patch('/player/:id', async (req, res) => {
     const { id } = req.params
     var { token, data } = req.body
     a = data
+    console.log(token, id)
     if (!checkUser(token, id)) {
         res.status(403).send({})
+        console.log('ok')
         return
     }
     user = jwt.decode(token)
     delete data.isAdmin
     console.log(data)
+    a['uid'] = user.sub
     var { data, error } = await supabase
         .from('players')
         .upsert(a)
-        .match({ uid: user.sub })
     console.log(data, error)
     res.status(200).send(data)
     if (a.isHidden) await supabase.rpc('updateRank')
