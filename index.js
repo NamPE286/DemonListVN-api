@@ -505,12 +505,6 @@ app.patch('/player/:id', async (req, res) => {
     user = jwt.decode(token)
     delete data.isAdmin
     console.log(data)
-    if (data.name.length > 20) {
-        res.status(400).send({
-            error: 'Name is too long (max 20 characters)'
-        })
-        return
-    }
     var { data, error } = await supabase
         .from('players')
         .upsert(a)
