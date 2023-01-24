@@ -24,7 +24,6 @@ if(redisEnabled){
 
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
-const invalidChar = new Set('/', '\\', '\n', '\t', '$', '?', '!', '@', '*')
 
 const GDClient = require('geometry-dash-api');
 
@@ -511,14 +510,6 @@ app.patch('/player/:id', async (req, res) => {
             error: 'Name is too long (max 20 characters)'
         })
         return
-    }
-    for (let i = 0; i < data.name.length; i++) {
-        if (invalidChar.has(data.name[i])) {
-            res.status(400).send({
-                error: 'Invalid name'
-            })
-            return
-        }
     }
     var { data, error } = await supabase
         .from('players')
