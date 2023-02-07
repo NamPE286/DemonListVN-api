@@ -250,7 +250,8 @@ app.patch('/level/:id', (req, res) => {
             minProgress: null,
             flTop: null,
             dlTop: null,
-            rating: null
+            rating: null,
+            ldm: null
         }
         const { id } = req.params
         var data = req.body.data
@@ -599,7 +600,6 @@ app.put('/record', async (req, res) => {
         }
         res.status(200).send(data)
     })
-
 })
 app.delete('/record/:userid/:levelid', async (req, res) => {
     const { token } = req.body
@@ -678,13 +678,34 @@ app.post('/submit/:newLevel', async (req, res) => {
     console.log(data, error)
     if (error) {
         if (newLevel) {
-            const apilv = await getLevel(req.body.levelid)
-            const creator = await getCreator(apilv.creatorUserID)
-            const lv = {
-                id: req.body.levelid,
-                name: apilv.name,
-                creator: creator.nick
+            var lv
+            try{
+                const apilv = await getLevel(req.body.levelid)
+                const creator = await getCreator(apilv.creatorUserID)
+                if(!apilv || !creator) {
+                    lv = {
+                        id: req.body.levelid,
+                        name: "Cannot retrieve data, please edit this field",
+                        creator: "Cannot retrieve data, please edit this field",
+                        ldm: []
+                    }
+                }
+                else lv = {
+                    id: req.body.levelid,
+                    name: apilv.name,
+                    creator: creator.nick,
+                    ldm: []
+                }
             }
+            catch{
+                lv = {
+                    id: req.body.levelid,
+                    name: "Cannot retrieve data, please edit this field",
+                    creator: "Cannot retrieve data, please edit this field",
+                    ldm: []
+                }
+            }
+
             var { data, error } = await supabase
                 .from('levels')
                 .insert(lv)
