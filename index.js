@@ -181,8 +181,18 @@ app.delete('level/:id', async (req, res) => {
             })
         }
         const { id } = req.params
-        await supabase.from("submissions").delete().match({ levelid: item.id });
-        await supabase.from('levels').delete().match({ id: id })
+        var { data, error } = await supabase
+            .from('submissions')
+            .delete()
+            .match({ levelid: id })
+        var { data, error } = await supabase
+            .from('records')
+            .delete()
+            .match({ levelid: id })
+        var { data, error } = await supabase
+            .from('levels')
+            .delete()
+            .match({ id: id })
         res.status(200)
         await supabase.rpc('updateList')
         if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
@@ -267,29 +277,13 @@ app.patch('/level/:id', (req, res) => {
         }
         if (level.minProgress < 1) level.minProgress = 100
         level.id = parseInt(id)
-        if (!level.dlTop && !level.flTop) {
-            var { data, error } = await supabase
-                .from('submissions')
-                .delete()
-                .match({ levelid: level.id })
-            var { data, error } = await supabase
-                .from('records')
-                .delete()
-                .match({ levelid: level.id })
-            var { data, error } = await supabase
-                .from('levels')
-                .delete()
-                .match({ id: level.id })
-        }
-        else {
-            var { data, error } = await supabase
-                .from('levels')
-                .update(level)
-                .match({ id: level.id })
-            if (error) {
-                res.status(500).send(error)
-                return
-            }
+        var { data, error } = await supabase
+            .from('levels')
+            .update(level)
+            .match({ id: level.id })
+        if (error) {
+            res.status(500).send(error)
+            return
         }
 
         if (error) {
