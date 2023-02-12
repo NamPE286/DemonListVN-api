@@ -172,7 +172,7 @@ app.get('/level/:id', async (req, res) => {
     d.records = data
     res.status(200).send(d)
 })
-app.delete('level/:id', async (req, res) => {
+app.delete('/level/:id', async (req, res) => {
     const { token } = req.body
     checkAdmin(token).then(async (user) => {
         if (!user.isAdmin) {
