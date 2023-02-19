@@ -8,7 +8,7 @@ require('dotenv').config()
 const redisEnabled = JSON.parse(process.env.ENABLE_REDIS)
 console.log(redisEnabled)
 var redisClient;
-if(redisEnabled){
+if (redisEnabled) {
     redisClient = require('redis').createClient({
         socket: {
             host: process.env.REDIS_HOST,
@@ -121,7 +121,13 @@ async function sendLog(msg, url = process.env.DISCORD_WEBHOOK) {
         })
     })
 }
-
+async function sendNotification(a) {
+    var data = a
+    data['timestamp'] = Date.now()
+    var { data, error } = await supabase
+        .from('notifications')
+        .insert(data)
+}
 cron.schedule('0 0 * * *', async () => {
     const { error } = await supabase.rpc('updateRank')
     console.log(error)
@@ -195,7 +201,7 @@ app.delete('/level/:id', async (req, res) => {
             .match({ id: id })
         res.status(200)
         await supabase.rpc('updateList')
-        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
+        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
@@ -240,7 +246,7 @@ app.post('/level/:id', (req, res) => {
         }
         res.status(200).send(level)
         await supabase.rpc('updateList')
-        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
+        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     })
 })
@@ -293,7 +299,7 @@ app.patch('/level/:id', (req, res) => {
         sendLog(`${user.name} (${user.uid}) modified ${level.name} (${id})`)
         res.status(200).send(level)
         await supabase.rpc('updateList')
-        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
+        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
     })
 })
 
@@ -319,7 +325,7 @@ async function getLevelsList(req, res) {
         console.log('ok')
         var listPtName = list == 'dl' ? 'rating' : `${list}Pt`
         var cachedData;
-        if(redisEnabled){
+        if (redisEnabled) {
             cachedData = await redisClient.get(`${list}Levels${id}`)
         }
         if (cachedData) {
@@ -344,7 +350,7 @@ async function getLevelsList(req, res) {
                     data: null
                 }
             }
-            if(redisEnabled) redisClient.set(`${list}Levels${id}`, JSON.stringify(data))
+            if (redisEnabled) redisClient.set(`${list}Levels${id}`, JSON.stringify(data))
             return {
                 error: null,
                 data: data
@@ -517,7 +523,7 @@ app.get('/search/:id', async (req, res) => {
     if (isNaN(id)) {
         console.log('ok')
         var cachedData
-        if(redisEnabled) cachedData = await redisClient.get(`search?${id}`)
+        if (redisEnabled) cachedData = await redisClient.get(`search?${id}`)
         if (cachedData) {
             console.log('cache hit')
             res.status(200).send(cachedData)
@@ -549,7 +555,7 @@ app.get('/search/:id', async (req, res) => {
             list.push(m[i])
         }
         res.status(200).send([list, players])
-        if(redisEnabled) redisClient.set(`search?${id}`, JSON.stringify([list, players]))
+        if (redisEnabled) redisClient.set(`search?${id}`, JSON.stringify([list, players]))
     }
     else {
         var { data, error } = await supabase
@@ -673,10 +679,10 @@ app.post('/submit/:newLevel', async (req, res) => {
     if (error) {
         if (newLevel) {
             var lv
-            try{
+            try {
                 const apilv = await getLevel(req.body.levelid)
                 const creator = await getCreator(apilv.creatorUserID)
-                if(!apilv || !creator) {
+                if (!apilv || !creator) {
                     lv = {
                         id: req.body.levelid,
                         name: "Cannot retrieve data, please edit this field",
@@ -691,7 +697,7 @@ app.post('/submit/:newLevel', async (req, res) => {
                     ldm: []
                 }
             }
-            catch{
+            catch {
                 lv = {
                     id: req.body.levelid,
                     name: "Cannot retrieve data, please edit this field",
@@ -739,7 +745,7 @@ app.patch('/refreshList', async (req, res) => {
         }
         var { error } = await supabase.rpc('updateRank')
         var { error } = await supabase.rpc('updateList')
-        if(redisEnabled) redisClient.flushAll('ASYNC', () => { })
+        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
         console.log(error)
         res.status(200).send(error)
     })
@@ -761,12 +767,55 @@ app.patch('/mergeAccount/:a/:b', async (req, res) => {
         var { error } = await supabase
             .from('players')
             .delete()
-            .match({uid: a})
+            .match({ uid: a })
         await supabase.rpc('updateRank')
         console.log(error)
         res.status(200).send(error)
     })
 })
+
+
+
+app.get('/notifications/:id', async (req, res) => {
+    const { id } = req.params
+    const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('to', id)
+    if (error) res.status(400).send(error)
+    else res.status(200).send(data)
+})
+
+app.post('/notifications/:id', async (req, res) => {
+    const { id } = req.params
+    const { data, token } = req.body
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
+            res.status(401).send({
+                'error': 'Token Invalid'
+            })
+            return
+        }
+        await sendNotification(data)
+        res.status(200).send()
+    })
+})
+
+app.delete('/notifications/:id', async (req, res) => {
+    const { id } = req.params
+    var { token } = req.body
+    if (!checkUser(token, id)) {
+        res.status(403).send({})
+        return
+    }
+    var { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('to', id)
+    if (error) res.status(400).send()
+    else res.status(200).send()
+})
+
 app.listen(
     PORT,
     () => {
