@@ -588,6 +588,10 @@ app.put('/record', async (req, res) => {
             .single()
         var playerName = data.name
         sendLog(`${user.name} (${user.uid}) modified ${playerName}'s (${record.userid}) ${lvName} (${record.levelid}) record`)
+        sendNotification({
+            'to': record.userid,
+            'content': `Your record of ${lvName} has been modified by a moderator`
+        })
         delete record.players
         delete record.levels
         var { data, error } = await supabase
@@ -617,6 +621,10 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
             .match({ userid: userid, levelid: levelid })
             .single()
         sendLog(`${user.name} (${user.uid}) deleted ${data.players.name}'s (${data.players.uid}) ${data.levels.name} (${data.levels.id}) record`)
+        sendNotification({
+            'to': data.players.uid,
+            'content': `Your record of ${lvName} has been deleted (rejected) by a moderator`
+        })
         var { data, error } = await supabase
             .from('records')
             .delete()
