@@ -51,7 +51,6 @@ async function del(id){
         .delete()
         .match({ id: id })
     await supabase.rpc('updateList')
-    if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
     sendLog(`${user.name} (${user.uid}) deleted ${id}`)
 }
 
@@ -78,7 +77,6 @@ async function post(id){
         .insert(level)
     if (error) throw errror
     await supabase.rpc('updateList')
-    if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
     sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     return level
 }
