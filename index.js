@@ -68,22 +68,8 @@ app.delete('/level/:id', async (req, res) => {
             })
         }
         const { id } = req.params
-        var { data, error } = await supabase
-            .from('submissions')
-            .delete()
-            .match({ levelid: id })
-        var { data, error } = await supabase
-            .from('records')
-            .delete()
-            .match({ levelid: id })
-        var { data, error } = await supabase
-            .from('levels')
-            .delete()
-            .match({ id: id })
+        await require('./level').delete(id)
         res.status(200)
-        await supabase.rpc('updateList')
-        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
-        sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
 
@@ -97,38 +83,8 @@ app.post('/level/:id', (req, res) => {
             return
         }
         const { id } = req.params
-        var level = {
-            name: null,
-            creator: null,
-            videoID: null,
-            minProgress: null,
-            flTop: null,
-            dlTop: null,
-        }
-        var { data } = req.body
-        for (const i in data) {
-            if (i in level) {
-                level[i] = data[i]
-            }
-        }
-        if (level.flTop != null) level.flTop -= 0.5
-        if (level.dlTop != null) level.dlTop -= 0.5
-        level.id = parseInt(id)
-        var { data, error } = await supabase
-            .from('levels')
-            .insert(level)
-        if (error) {
-            res.status(500).send(error)
-            return
-        }
-        if (error) {
-            res.status(500).send(error)
-            return
-        }
+        const level = await require('./level').post(id)
         res.status(200).send(level)
-        await supabase.rpc('updateList')
-        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
-        sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     })
 })
 app.patch('/level/:id', (req, res) => {
