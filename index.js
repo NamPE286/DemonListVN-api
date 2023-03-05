@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken')
 const app = express()
 const fetch = require('cross-fetch')
 const cron = require('node-cron');
-const supabase = require('./db')
 const GDClient = require('geometry-dash-api');
 
 require('dotenv').config()
@@ -27,8 +26,6 @@ if (redisEnabled) {
 
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
-
-const GDClient = require('geometry-dash-api');
 
 const client = new GDClient({
     userName: 'dummy',
