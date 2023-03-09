@@ -1,5 +1,5 @@
-const supabase = require('../../db')
-const getLevel = require('../../etc/getLevel')
+const supabase = require('../../../db')
+const getLevel = require('../../../etc/getLevel')
 
 module.exports = async (id) => {
     const d = {

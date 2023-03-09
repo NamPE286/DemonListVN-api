@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
 })
 app.get('/level/:id', async (req, res) => {
     const { id } = req.params
-    const data = await require('./src/level/GET')(id)
+    const data = await require('./src/level/id/GET')(id)
     if(!data) {
         res.status(404).send({message: 'Level does not exists.'})
         return
