@@ -1,3 +1,10 @@
+const GDClient = require('geometry-dash-api');
+
+const client = new GDClient({
+    userName: 'dummy',
+    password: 'dummy'
+});
+
 async function getLevel(id) {
     var level = {
         levelID: null,

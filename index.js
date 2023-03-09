@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken')
 const app = express()
 const fetch = require('cross-fetch')
 const cron = require('node-cron');
-const GDClient = require('geometry-dash-api');
 
 require('dotenv').config()
 const redisEnabled = JSON.parse(process.env.ENABLE_REDIS)
@@ -27,107 +26,13 @@ if (redisEnabled) {
 const PORT = process.env.PORT || 5050
 const supabase = require('@supabase/supabase-js').createClient(process.env.API_URL, process.env.API_KEY)
 
-const client = new GDClient({
-    userName: 'dummy',
-    password: 'dummy'
-});
+const checkAdmin = require('./etc/checkAdmin')
+const checkUser = require('./etc/checkUser')
+const getCreator = require('./etc/getCreator')
+const getLevel = require('./etc/getLevel')
+const sendLog = require('./etc/sendLog')
+const sendNotification = require('./etc/sendNotification')
 
-
-
-async function getLevel(id) {
-    var level = {
-        levelID: null,
-        name: null,
-        desc: null,
-        version: null,
-        creatorUserID: null,
-        diff: null,
-        downloads: null,
-        likes: null,
-        track: null,
-        gameVersion: null,
-        demonDiff: null,
-        stars: null,
-        isFeatured: null,
-        isEpic: null,
-        length: null,
-        original: null,
-        songID: null,
-        coins: null,
-        requestedStars: null,
-        isLDM: null,
-        password: null
-    }
-    try {
-        level = await client.api.levels.getById({ levelID: parseInt(id) })
-    }
-    catch {
-        return level
-    }
-    level.desc = Buffer.from(level.desc, 'base64').toString()
-    level['difficulty'] = level.diff
-    if (level.stars == 10) {
-        if (level.diff == 'Easy') level.difficulty = 'Easy Demon'
-        else if (level.diff == 'Normal') level.difficulty = 'Medium Demon'
-        else if (level.diff == 'Hard') level.difficulty = 'Hard Demon'
-        else if (level.diff == 'Harder') level.difficulty = 'Insane Demon'
-        else level.difficulty = 'Extreme Demon'
-    }
-    level.verifiedCoins = true
-    level.length = level.length[0].toUpperCase() + level.length.slice(1).toLowerCase()
-    if (level.length == 'Xl') level.length = 'XL'
-    return level
-}
-async function getCreator(id) {
-    const user = await client.api.users.find({ query: id, page: 0 });
-    return user.users[0]
-}
-async function checkAdmin(token) {
-    try {
-        jwt.verify(token, process.env.JWT_SECRET)
-        user = jwt.decode(token)
-        var { data, error } = await supabase
-            .from('players')
-            .select('*')
-            .eq('uid', user.sub)
-            .single()
-        return data
-    }
-    catch (err) {
-        return false
-    }
-}
-
-function checkUser(token, uid) {
-    try {
-        jwt.verify(token, process.env.JWT_SECRET)
-        user = jwt.decode(token)
-        return user.sub == uid
-    }
-    catch (err) {
-        return false
-    }
-}
-
-async function sendLog(msg, url = process.env.DISCORD_WEBHOOK) {
-    console.log(msg, url)
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            content: msg
-        })
-    })
-}
-async function sendNotification(a) {
-    var data = a
-    data['timestamp'] = Date.now()
-    var { data, error } = await supabase
-        .from('notifications')
-        .insert(data)
-}
 cron.schedule('0 0 * * *', async () => {
     const { error } = await supabase.rpc('updateRank')
     console.log(error)
@@ -144,40 +49,12 @@ app.get('/', (req, res) => {
 })
 app.get('/level/:id', async (req, res) => {
     const { id } = req.params
-    const d = {
-        data: {},
-        records: []
-    }
-    var { data, error } = await supabase
-        .from('levels')
-        .select('*')
-        .eq('id', id)
-    if (data.length == 0) {
-        res.status(400).send({
-            error: 'Level does not exists'
-        })
+    const data = await require('./src/level/GET')(id)
+    if(!data) {
+        res.status(404).send({message: 'Level does not exists.'})
         return
     }
-    d.data = data[0]
-    const lvapi = await getLevel(id)
-    d.data['difficulty'] = lvapi.difficulty
-    d.data['description'] = lvapi.desc
-    d.data['downloads'] = lvapi.downloads
-    d.data['likes'] = lvapi.likes
-    if (lvapi.disliked) d.data.likes *= -1
-    d.data['length'] = lvapi.length
-    d.data['coins'] = lvapi.coins
-    d.data['verifiedCoins'] = lvapi.verifiedCoins
-    var { data, error } = await supabase
-        .from('records')
-        .select('*, players!inner(name, rating, isHidden)')
-        .eq('levelid', id)
-        .eq('players.isHidden', false)
-        .eq('isChecked', true)
-        .order('progress', { ascending: false })
-        .order('timestamp', { ascending: true })
-    d.records = data
-    res.status(200).send(d)
+    res.status(200).send(data)
 })
 app.delete('/level/:id', async (req, res) => {
     const { token } = req.body

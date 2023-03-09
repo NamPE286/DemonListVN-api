@@ -11,11 +11,13 @@
 | `list`            | `fl (VN only)` `dl (VN only)` `sea`
 | `orderBy`         | `timestamp` `dlPt` `flPt` `levelid`
 | `pageNumber`      | `number`
-| `country`         | `alpha-2 code` `can be blank`
 
 ## Get a level's info and records
 ### Request
-  `GET /level/[levelID]/[country]`
+  `GET /level/[levelID]`
+
+### Example
+  `GET /level/57828784`
 
 ### Response
 
@@ -24,30 +26,43 @@
         "id": 57828784,
         "name": "The Rupture",
         "creator": "Ka1ns",
-        "videoID": "Mmg5Lp13fUw",
+        "videoID": "SaU454afkKY",
         "minProgress": 50,
         "flTop": null,
         "dlTop": 1,
         "flPt": null,
-        "dlPt": 137.78
+        "dlPt": 151.49,
+        "rating": 4000,
+        "ldm": [
+          null
+        ],
+        "difficulty": "Extreme Demon",
+        "description": "After opening The Rupture only few creatures survived... But for how long... Verified by Dolphy <3",
+        "downloads": 107537,
+        "likes": 4148,
+        "length": "Long",
+        "coins": 0,
+        "verifiedCoins": true
       },
       "records": [
         {
           "videoLink": "https://youtu.be/Mmg5Lp13fUw",
           "refreshRate": 360,
           "progress": 100,
-          "timestamp": 1659171892741,
+          "timestamp": 1653789612000,
           "flPt": null,
-          "dlPt": 137.78,
-          "id": 1008,
+          "dlPt": 4000,
           "userid": "478a6d4d-8f50-4ed7-9ecd-966131ebaacd",
           "levelid": 57828784,
           "mobile": false,
+          "isChecked": true,
+          "comment": null,
           "players": {
-            "name": "LBoke"
+            "name": "LBoke",
+            "rating": 4395,
+            "isHidden": false
           }
-        },
-        ...
+        }
       ]
     }
 
