@@ -1,3 +1,5 @@
+const supabase = require('../db')
+
 async function sendNotification(a) {
     var dat = a
     dat['timestamp'] = Date.now()

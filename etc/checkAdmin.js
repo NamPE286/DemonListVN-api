@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken')
+const supabase = require('../db')
+
 async function checkAdmin(token) {
     try {
         jwt.verify(token, process.env.JWT_SECRET)
@@ -10,6 +13,7 @@ async function checkAdmin(token) {
         return data
     }
     catch (err) {
+        console.log(err)
         return false
     }
 }

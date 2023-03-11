@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken')
+const supabase = require('../db')
+
 function checkUser(token, uid) {
     try {
         jwt.verify(token, process.env.JWT_SECRET)
