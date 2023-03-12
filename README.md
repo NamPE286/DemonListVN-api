@@ -134,24 +134,33 @@
 ## Get a player's info
 ### Request
   `GET /player/[userID]`
+### Example
+  `GET /player/478a6d4d-8f50-4ed7-9ecd-966131ebaacd`
 
 ### Response
-    
-    {
-      "id": 10,
-      "name": "Zophirux",
-      "email": "vnpropvpabc@gmail.com",
-      "avatar": "https://media.discordapp.net/attachments/747355506913443853/1001756936984866886/baqua_2.PNG",
-      "facebook": "https://www.facebook.com/profile.php?id=100057368619265",
-      "youtube": "https://www.youtube.com/c/Zophirux",
-      "discord": "Zophirux#8242",
-      "totalFLpt": 2647.63,
-      "totalDLpt": 387.36,
-      "flrank": 1,
-      "dlrank": 14,
-      "uid": "3a24c91a-d45f-4e93-83f6-569858aaa35b",
-      "isAdmin": false
-    }
+```json
+{
+    "id": 228,
+    "name": "LBoke",
+    "email": "lbokegd@gmail.com",
+    "avatar": "Ppcat",
+    "facebook": "https://www.facebook.com/poko.nguyen.90",
+    "youtube": "https://www.youtube.com/channel/UCSRD9giojTqVGPLbGFiAhDQ",
+    "discord": "Bokery#7128",
+    "totalFLpt": 729.89,
+    "totalDLpt": 63143,
+    "flrank": 20,
+    "dlrank": 4,
+    "uid": "478a6d4d-8f50-4ed7-9ecd-966131ebaacd",
+    "isAdmin": false,
+    "isBanned": false,
+    "isHidden": false,
+    "rating": 4395,
+    "dlMaxPt": 4000,
+    "flMaxPt": 219,
+    "overallRank": 1
+}
+```
     
 
 ## Get a player's records
