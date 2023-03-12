@@ -51,7 +51,7 @@ app.get('/level/:id', async (req, res) => {
     const { id } = req.params
     const data = await require('./src/level/id/GET')(id)
     if(!data) {
-        res.status(404).send({message: 'Level does not exists.'})
+        res.status(404).send({message: 'Level does not exist.'})
         return
     }
     res.status(200).send(data)
@@ -226,15 +226,9 @@ app.get('/levels/:list/page/:id/:uid?/:filter?', async (req, res) => {
 })
 app.get('/player/:id', async (req, res) => {
     const { id } = req.params
-    var { data, error } = await supabase
-        .from('players')
-        .select('*')
-        .eq('uid', id)
-        .single()
-    if (!data) {
-        res.status(400).send({
-            error: 'Player does not exists'
-        })
+    const data = await require('./src/player/GET')(id)
+    if(!data) {
+        res.status(404).send({message: 'Player does not exist.'})
         return
     }
     res.status(200).send(data)
@@ -258,7 +252,10 @@ app.get('/player/:id/records/:order', async (req, res) => {
         .eq('userid', id)
         .eq('isChecked', true)
         .order(order, { ascending: false })
-    res.status(200).send(data)
+    if(!data) {
+        res.status(404).send({message: 'No record for this player.'})
+    }
+    res.status(200).send(data);
 })
 app.get('/players/rating/page/:id', async (req, res) => {
     const { id } = req.params
