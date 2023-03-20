@@ -56,6 +56,7 @@ app.get('/level/:id', async (req, res) => {
     }
     res.status(200).send(data)
 })
+
 app.delete('/level/:id', async (req, res) => {
     const { token } = req.body
     checkAdmin(token).then(async (user) => {
@@ -65,8 +66,22 @@ app.delete('/level/:id', async (req, res) => {
             })
         }
         const { id } = req.params
-        await require('./level').delete(id)
+        var { data, error } = await supabase
+            .from('submissions')
+            .delete()
+            .match({ levelid: id })
+        var { data, error } = await supabase
+            .from('records')
+            .delete()
+            .match({ levelid: id })
+        var { data, error } = await supabase
+            .from('levels')
+            .delete()
+            .match({ id: id })
         res.status(200)
+        await supabase.rpc('updateList')
+        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
+        sendLog(`${user.name} (${user.uid}) deleted ${id}`)
     })
 })
 
@@ -80,10 +95,41 @@ app.post('/level/:id', (req, res) => {
             return
         }
         const { id } = req.params
-        const level = await require('./level').post(id)
+        var level = {
+            name: null,
+            creator: null,
+            videoID: null,
+            minProgress: null,
+            flTop: null,
+            dlTop: null,
+        }
+        var { data } = req.body
+        for (const i in data) {
+            if (i in level) {
+                level[i] = data[i]
+            }
+        }
+        if (level.flTop != null) level.flTop -= 0.5
+        if (level.dlTop != null) level.dlTop -= 0.5
+        level.id = parseInt(id)
+        var { data, error } = await supabase
+            .from('levels')
+            .insert(level)
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
         res.status(200).send(level)
+        await supabase.rpc('updateList')
+        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
+        sendLog(`${user.name} (${user.uid}) added ${level.name} (${id})`)
     })
 })
+
 app.patch('/level/:id', (req, res) => {
     const { token } = req.body
     checkAdmin(token).then(async (user) => {
@@ -93,11 +139,50 @@ app.patch('/level/:id', (req, res) => {
             })
             return
         }
+        var level = {
+            name: null,
+            creator: null,
+            videoID: null,
+            minProgress: null,
+            flTop: null,
+            dlTop: null,
+            rating: null,
+            ldm: null
+        }
         const { id } = req.params
-        const level = await require('./level').patch(id)
+        var data = req.body.data
+
+        if (data.flTop == null) { }
+        else if (data.flTop < data.prevflTop) data.flTop -= 0.5
+        else if (data.flTop > data.prevflTop) data.flTop += 0.5
+
+        for (const i in data) {
+            if (i in level) {
+                level[i] = data[i]
+            }
+        }
+        if (level.minProgress < 1) level.minProgress = 100
+        level.id = parseInt(id)
+        var { data, error } = await supabase
+            .from('levels')
+            .update(level)
+            .match({ id: level.id })
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
+
+        if (error) {
+            res.status(500).send(error)
+            return
+        }
+        sendLog(`${user.name} (${user.uid}) modified ${level.name} (${id})`)
         res.status(200).send(level)
+        await supabase.rpc('updateList')
+        if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
     })
 })
+
 
 async function getLevelsList(req, res) {
     const { id, list } = req.params
