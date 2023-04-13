@@ -501,7 +501,7 @@ app.delete('/record/:userid/:levelid', async (req, res) => {
         sendLog(`${user.name} (${user.uid}) deleted ${data.players.name}'s (${data.players.uid}) ${data.levels.name} (${data.levels.id}) record`)
         sendNotification({
             'to': data.players.uid,
-            'content': `Your record of ${lvName} has been deleted (rejected) by a moderator`
+            'content': `Your record of ${data.levels.name} has been deleted (rejected) by a moderator`
         })
         var { data, error } = await supabase
             .from('records')
