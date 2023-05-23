@@ -333,7 +333,7 @@ app.get('/player/:id/records/:order', async (req, res) => {
     const { id, order } = req.params
     var { data, error } = await supabase
         .from('records')
-        .select('*, levels(name)')
+        .select('*, levels(name, creator)')
         .eq('userid', id)
         .eq('isChecked', true)
         .order(order, { ascending: false })
