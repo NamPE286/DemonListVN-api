@@ -23,7 +23,7 @@ module.exports = async (id) => {
     d.data['verifiedCoins'] = lvapi.verifiedCoins
     var { data, error } = await supabase
         .from('records')
-        .select('*, players!inner(name, rating, isHidden)')
+        .select('*, players!inner(*)')
         .eq('levelid', id)
         .eq('players.isHidden', false)
         .eq('isChecked', true)
