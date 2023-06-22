@@ -1,47 +1,47 @@
-[
-    {
+{
+    "Bắc Giang": {
         "name": "Bắc Giang",
         "region": "Northeast",
         "cities": [
             "Bắc Giang"
         ]
     },
-    {
+    "Bắc Kạn": {
         "name": "Bắc Kạn",
         "region": "Northeast",
         "cities": [
             "Bắc Kạn"
         ]
     },
-    {
+    "Cao Bằng": {
         "name": "Cao Bằng",
         "region": "Northeast",
         "cities": [
             "Cao Bằng"
         ]
     },
-    {
+    "Hà Giang": {
         "name": "Hà Giang",
         "region": "Northeast",
         "cities": [
             "Hà Giang"
         ]
     },
-    {
+    "Lạng Sơn": {
         "name": "Lạng Sơn",
         "region": "Northeast",
         "cities": [
             "Lạng Sơn"
         ]
     },
-    {
+    "Phú Thọ": {
         "name": "Phú Thọ",
         "region": "Northeast",
         "cities": [
             "Việt Trì"
         ]
     },
-    {
+    "Quảng Ninh": {
         "name": "Quảng Ninh",
         "region": "Northeast",
         "cities": [
@@ -51,7 +51,7 @@
             "Uông Bí"
         ]
     },
-    {
+    "Thái Nguyên": {
         "name": "Thái Nguyên",
         "region": "Northeast",
         "cities": [
@@ -59,70 +59,70 @@
             "Thái Nguyên"
         ]
     },
-    {
+    "Tuyên Quang": {
         "name": "Tuyên Quang",
         "region": "Northeast",
         "cities": [
             "Tuyên Quang"
         ]
     },
-    {
+    "Lào Cai": {
         "name": "Lào Cai",
         "region": "Northeast",
         "cities": [
             "Lào Cai"
         ]
     },
-    {
+    "Yên Bái": {
         "name": "Yên Bái",
         "region": "Northwest",
         "cities": [
             "Yên Bái"
         ]
     },
-    {
+    "Điện Biên": {
         "name": "Điện Biên",
         "region": "Northwest",
         "cities": [
             "Điện Biên Phủ"
         ]
     },
-    {
+    "Hòa Bình": {
         "name": "Hòa Bình",
         "region": "Northwest",
         "cities": [
             "Hòa Bình"
         ]
     },
-    {
+    "Lai Châu": {
         "name": "Lai Châu",
         "region": "Northwest",
         "cities": [
             "Lai Châu"
         ]
     },
-    {
+    "Sơn La": {
         "name": "Sơn La",
         "region": "Northwest",
         "cities": [
             "Sơn La"
         ]
     },
-    {
+    "Bắc Ninh": {
         "name": "Bắc Ninh",
         "region": "Red River Delta",
         "cities": [
             "Bắc Ninh"
         ]
     },
-    {
+    "Hà Nam": {
         "name": "Hà Nam",
         "region": "Red River Delta",
         "cities": [
             "Phủ Lý"
         ]
     },
-    {
+    "Hải Dương": {
         "name": "Hải Dương",
         "region": "Red River Delta",
         "cities": [
@@ -130,21 +130,21 @@
             "Hải Dương"
         ]
     },
-    {
+    "Hưng Yên": {
         "name": "Hưng Yên",
         "region": "Red River Delta",
         "cities": [
             "Hưng Yên"
         ]
     },
-    {
+    "Nam Định": {
         "name": "Nam Định",
         "region": "Red River Delta",
         "cities": [
             "Nam Định"
         ]
     },
-    {
+    "Ninh Bình": {
         "name": "Ninh Bình",
         "region": "Red River Delta",
         "cities": [
@@ -152,14 +152,14 @@
             "Tam Điệp"
         ]
     },
-    {
+    "Thái Bình": {
         "name": "Thái Bình",
         "region": "Red River Delta",
         "cities": [
             "Thái Bình"
         ]
     },
-    {
+    "Vĩnh Phúc": {
         "name": "Vĩnh Phúc",
         "region": "Red River Delta",
         "cities": [
@@ -167,49 +167,49 @@
             "Vĩnh Yên"
         ]
     },
-    {
+    "Hà Nội": {
         "name": "Hà Nội",
         "region": "Red River Delta",
         "cities": [
             "Hà Nội"
         ]
     },
-    {
+    "Hải Phòng": {
         "name": "Hải Phòng",
         "region": "Red River Delta",
         "cities": [
             "Hải Phòng"
         ]
     },
-    {
+    "Hà Tĩnh": {
         "name": "Hà Tĩnh",
         "region": "North Central Coast",
         "cities": [
             "Hà Tĩnh"
         ]
     },
-    {
+    "Nghệ An": {
         "name": "Nghệ An",
         "region": "North Central Coast",
         "cities": [
             "Vinh"
         ]
     },
-    {
+    "Quảng Bình": {
         "name": "Quảng Bình",
         "region": "North Central Coast",
         "cities": [
             "Đồng Hới"
         ]
     },
-    {
+    "Quảng Trị": {
         "name": "Quảng Trị",
         "region": "North Central Coast",
         "cities": [
             "Đông Hà"
         ]
     },
-    {
+    "Thanh Hóa": {
         "name": "Thanh Hóa",
         "region": "North Central Coast",
         "cities": [
@@ -217,42 +217,42 @@
             "Thanh Hóa"
         ]
     },
-    {
+    "Thừa Thiên Huế": {
         "name": "Thừa Thiên Huế",
         "region": "North Central Coast",
         "cities": [
             "Huế"
         ]
     },
-    {
+    "Đắk Lắk": {
         "name": "Đắk Lắk",
         "region": "Central Highlands",
         "cities": [
             "Buôn Ma Thuột"
         ]
     },
-    {
+    "Đắk Nông": {
         "name": "Đắk Nông",
         "region": "Central Highlands",
         "cities": [
             "Gia Nghĩa"
         ]
     },
-    {
+    "Gia Lai": {
         "name": "Gia Lai",
         "region": "Central Highlands",
         "cities": [
             "Pleiku"
         ]
     },
-    {
+    "Kon Tum": {
         "name": "Kon Tum",
         "region": "Central Highlands",
         "cities": [
             "Kon Tum"
         ]
     },
-    {
+    "Lâm Đồng": {
         "name": "Lâm Đồng",
         "region": "Central Highlands",
         "cities": [
@@ -260,21 +260,21 @@
             "Đà Lạt"
         ]
     },
-    {
+    "Bình Định": {
         "name": "Bình Định",
         "region": "South Central Coast",
         "cities": [
             "Quy Nhơn"
         ]
     },
-    {
+    "Bình Thuận": {
         "name": "Bình Thuận",
         "region": "South Central Coast",
         "cities": [
             "Phan Thiết"
         ]
     },
-    {
+    "Khánh Hòa": {
         "name": "Khánh Hòa",
         "region": "South Central Coast",
         "cities": [
@@ -282,21 +282,21 @@
             "Nha Trang"
         ]
     },
-    {
+    "Ninh Thuận": {
         "name": "Ninh Thuận",
         "region": "South Central Coast",
         "cities": [
             "Phan Rang - Tháp Chàm"
         ]
     },
-    {
+    "Phú Yên": {
         "name": "Phú Yên",
         "region": "South Central Coast",
         "cities": [
             "Tuy Hòa"
         ]
     },
-    {
+    "Quảng Nam": {
         "name": "Quảng Nam",
         "region": "South Central Coast",
         "cities": [
@@ -304,21 +304,21 @@
             "Tam Kỳ"
         ]
     },
-    {
+    "Quảng Ngãi": {
         "name": "Quảng Ngãi",
         "region": "South Central Coast",
         "cities": [
             "Quảng Ngãi"
         ]
     },
-    {
+    "Đà Nẵng": {
         "name": "Đà Nẵng",
         "region": "South Central Coast",
         "cities": [
             "Đà Nẵng"
         ]
     },
-    {
+    "Bà Rịa-Vũng Tàu": {
         "name": "Bà Rịa-Vũng Tàu",
         "region": "Southeast",
         "cities": [
@@ -326,7 +326,7 @@
             "Vũng Tàu"
         ]
     },
-    {
+    "Bình Dương": {
         "name": "Bình Dương",
         "region": "Southeast",
         "cities": [
@@ -336,14 +336,14 @@
             "Thuận An"
         ]
     },
-    {
+    "Bình Phước": {
         "name": "Bình Phước",
         "region": "Southeast",
         "cities": [
             "Đồng Xoài"
         ]
     },
-    {
+    "Đồng Nai": {
         "name": "Đồng Nai",
         "region": "Southeast",
         "cities": [
@@ -351,21 +351,21 @@
             "Long Khánh"
         ]
     },
-    {
+    "Tây Ninh": {
         "name": "Tây Ninh",
         "region": "Southeast",
         "cities": [
             "Tây Ninh"
         ]
     },
-    {
+    "Hồ Chí Minh": {
         "name": "Hồ Chí Minh",
         "region": "Southeast",
         "cities": [
             "Hồ Chí Minh"
         ]
     },
-    {
+    "An Giang": {
         "name": "An Giang",
         "region": "Mekong Delta",
         "cities": [
@@ -373,28 +373,28 @@
             "Long Xuyên"
         ]
     },
-    {
+    "Bạc Liêu": {
         "name": "Bạc Liêu",
         "region": "Mekong Delta",
         "cities": [
             "Bạc Liêu"
         ]
     },
-    {
+    "Bến Tre": {
         "name": "Bến Tre",
         "region": "Mekong Delta",
         "cities": [
             "Bến Tre"
         ]
     },
-    {
+    "Cà Mau": {
         "name": "Cà Mau",
         "region": "Mekong Delta",
         "cities": [
             "Cà Mau"
         ]
     },
-    {
+    "Đồng Tháp": {
         "name": "Đồng Tháp",
         "region": "Mekong Delta",
         "cities": [
@@ -402,7 +402,7 @@
             "Sa Đéc"
         ]
     },
-    {
+    "Hậu Giang": {
         "name": "Hậu Giang",
         "region": "Mekong Delta",
         "cities": [
@@ -410,7 +410,7 @@
             "Vị Thanh"
         ]
     },
-    {
+    "Kiên Giang": {
         "name": "Kiên Giang",
         "region": "Mekong Delta",
         "cities": [
@@ -419,46 +419,46 @@
             "Rạch Giá"
         ]
     },
-    {
+    "Long An": {
         "name": "Long An",
         "region": "Mekong Delta",
         "cities": [
             "Tân An"
         ]
     },
-    {
+    "Sóc Trăng": {
         "name": "Sóc Trăng",
         "region": "Mekong Delta",
         "cities": [
             "Sóc Trăng"
         ]
     },
-    {
+    "Tiền Giang": {
         "name": "Tiền Giang",
         "region": "Mekong Delta",
         "cities": [
             "Mỹ Tho"
         ]
     },
-    {
+    "Trà Vinh": {
         "name": "Trà Vinh",
         "region": "Mekong Delta",
         "cities": [
             "Trà Vinh"
         ]
     },
-    {
+    "Vĩnh Long": {
         "name": "Vĩnh Long",
         "region": "Mekong Delta",
         "cities": [
             "Vĩnh Long"
         ]
     },
-    {
+    "Cần Thơ": {
         "name": "Cần Thơ",
         "region": "Mekong Delta",
         "cities": [
             "Cần Thơ"
         ]
     }
-]
+}
