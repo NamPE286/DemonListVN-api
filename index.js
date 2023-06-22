@@ -47,6 +47,11 @@ app.get('/', (req, res) => {
     console.log('server ok')
     res.status(200).send({ message: 'server ok' })
 })
+
+app.get('/provinces', (req, res) => {
+    res.status(200).send(require('./provinces.json'))
+})
+
 app.get('/level/:id', async (req, res) => {
     const { id } = req.params
     const data = await require('./src/level/id/GET')(id)
