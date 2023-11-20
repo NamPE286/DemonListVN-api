@@ -69,6 +69,8 @@ app.delete('/level/:id', async (req, res) => {
             res.status(401).send({
                 'error': 'Token Invalid'
             })
+
+            return
         }
         const { id } = req.params
         var { data, error } = await supabase
@@ -87,6 +89,47 @@ app.delete('/level/:id', async (req, res) => {
         await supabase.rpc('updateList')
         if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) deleted ${id}`)
+    })
+})
+
+app.delete('/level/:id/song', async (req, res) => {
+    const { id } = req.params
+    const { token } = req.body
+    checkAdmin(token).then(async (user) => {
+        if (!user.isAdmin) {
+            res.status(401).send({
+                'error': 'Token Invalid'
+            })
+
+            return
+        }
+
+        var { data, error } = await supabase
+            .from('levels')
+            .select('*')
+            .eq('id', id)
+            .single()
+        
+        level = data
+
+        
+        if (level.songID == null) {
+            res.status(500);
+            return
+        }
+
+        var { data, error } = await supabase
+            .storage
+            .from("songs")
+            .remove([`${level.songID}.mp3`]);
+        level.songID = null
+
+        var { data, error } = await supabase
+            .from('levels')
+            .update(level)
+            .match({ id: level.id })
+        res.status(200)
+        sendLog(`${user.name} (${user.uid}) deleted ${id} song`)
     })
 })
 
@@ -660,8 +703,6 @@ app.patch('/mergeAccount/:a/:b', async (req, res) => {
         res.status(200).send(error)
     })
 })
-
-
 
 app.get('/notifications/:id', async (req, res) => {
     const { id } = req.params
