@@ -112,7 +112,6 @@ app.delete('/level/:id/song', async (req, res) => {
         
         level = data
 
-        
         if (level.songID == null) {
             res.status(500);
             return
