@@ -195,6 +195,7 @@ app.patch('/level/:id', (req, res) => {
             flTop: null,
             dlTop: null,
             rating: null,
+            songID: null,
         }
         const { id } = req.params
         var data = req.body.data
