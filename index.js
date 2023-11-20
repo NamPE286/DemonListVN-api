@@ -152,7 +152,6 @@ app.patch('/level/:id', (req, res) => {
             flTop: null,
             dlTop: null,
             rating: null,
-            ldm: null
         }
         const { id } = req.params
         var data = req.body.data
@@ -578,14 +577,12 @@ app.post('/submit/:newLevel', async (req, res) => {
                         id: req.body.levelid,
                         name: "Cannot retrieve data, please edit this field",
                         creator: "Cannot retrieve data, please edit this field",
-                        ldm: []
                     }
                 }
                 else lv = {
                     id: req.body.levelid,
                     name: apilv.name,
                     creator: creator.nick,
-                    ldm: []
                 }
             }
             catch {
@@ -593,7 +590,6 @@ app.post('/submit/:newLevel', async (req, res) => {
                     id: req.body.levelid,
                     name: "Cannot retrieve data, please edit this field",
                     creator: "Cannot retrieve data, please edit this field",
-                    ldm: []
                 }
             }
 
