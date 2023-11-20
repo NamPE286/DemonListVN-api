@@ -85,7 +85,7 @@ app.delete('/level/:id', async (req, res) => {
             .from('levels')
             .delete()
             .match({ id: id })
-        res.status(200)
+        res.status(200).send()
         await supabase.rpc('updateList')
         if (redisEnabled) redisClient.flushAll('ASYNC', () => { })
         sendLog(`${user.name} (${user.uid}) deleted ${id}`)
@@ -113,7 +113,7 @@ app.delete('/level/:id/song', async (req, res) => {
         level = data
 
         if (level.songID == null) {
-            res.status(500);
+            res.status(500).send();
             return
         }
 
@@ -127,7 +127,7 @@ app.delete('/level/:id/song', async (req, res) => {
             .from('levels')
             .update(level)
             .match({ id: level.id })
-        res.status(200)
+        res.status(200).send()
         sendLog(`${user.name} (${user.uid}) deleted ${id} song`)
     })
 })
