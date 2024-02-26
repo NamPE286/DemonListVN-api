@@ -148,7 +148,7 @@ app.post('/level/:id', (req, res) => {
             videoID: null,
             minProgress: null,
             flTop: null,
-            dlTop: null,
+            rating: null,
         }
         var { data } = req.body
         for (const i in data) {
@@ -157,7 +157,6 @@ app.post('/level/:id', (req, res) => {
             }
         }
         if (level.flTop != null) level.flTop -= 0.5
-        if (level.dlTop != null) level.dlTop -= 0.5
         level.id = parseInt(id)
         var { data, error } = await supabase
             .from('levels')
